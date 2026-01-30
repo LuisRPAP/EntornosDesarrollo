@@ -1,0 +1,40 @@
+nov 21, 2025 4:33:09 P. M. com.iescomercio.prog1.logger1.Principal main
+INFO: Aplicación iniciada.
+nov 21, 2025 4:33:16 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+INFO: Línea Leída .10 % 3
+nov 21, 2025 4:33:16 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de n .10
+nov 21, 2025 4:33:16 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de m .3
+nov 21, 2025 4:33:16 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+INFO: Resultado : 1
+nov 21, 2025 4:33:21 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+INFO: Línea Leída .0 % 0
+nov 21, 2025 4:33:21 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de n .0
+nov 21, 2025 4:33:21 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de m .0
+nov 21, 2025 4:33:21 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+WARNING: Se devuelve -1
+nov 21, 2025 4:33:21 P. M. com.iescomercio.prog1.logger1.Principal main
+INFO: Aplicación finalizada.
+nov 21, 2025 4:40:02 P. M. com.iescomercio.prog1.logger1.Principal main
+INFO: Aplicación iniciada.
+nov 21, 2025 4:40:07 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+INFO: Línea Leída .10 % 3
+nov 21, 2025 4:40:07 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de n .10
+nov 21, 2025 4:40:07 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de m .3
+nov 21, 2025 4:40:07 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+INFO: Resultado : 1
+nov 21, 2025 4:40:12 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+INFO: Línea Leída .0 % 0
+nov 21, 2025 4:40:12 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de n .0
+nov 21, 2025 4:40:12 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+FINE: Valor de m .0
+nov 21, 2025 4:40:12 P. M. com.iescomercio.prog1.logger1.Principal nModuloM
+WARNING: Se devuelve -1
+nov 21, 2025 4:40:12 P. M. com.iescomercio.prog1.logger1.Principal main
+INFO: Aplicación finalizada.
