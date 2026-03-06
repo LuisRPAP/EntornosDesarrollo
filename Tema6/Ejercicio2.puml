@@ -1,0 +1,38 @@
+@startuml name Ejercicio2_LRP
+
+left to right direction 
+
+actor Profesores
+actor Alumnos
+
+
+usecase "login" as UC1    
+usecase "DNI Electronico" as UC11    
+usecase "Analisis Biometrico" as UC12    
+usecase "Usuario y contraseña" as UC13    
+usecase "Introducir Notas" as UC2
+usecase "Consulta Notas" as UC3  
+usecase "Listar Notas" as UC4  
+usecase "Modificar Notas" as UC5  
+usecase "Consulta Expediente" as UC6  
+usecase "Generar expediente PDF" as UC7 
+usecase "Descargar PDF" as UC8 
+
+Profesores --> UC1
+Profesores --> UC2
+Profesores --> UC4
+Profesores --> UC5
+
+Alumnos --> UC1
+Alumnos --> UC3
+Alumnos --> UC6
+
+
+UC1 ..> UC11 : <<extend>>\n[Si eres profesor Opcion]
+UC1 ..> UC12 : <<extend>>\n[Si eres profesor Opcion]
+UC1 ..> UC13 : <<extend>>\n[Solo para Alumnos]
+
+UC4 ..> UC7 : <<extend>>\n[Opcion]
+UC7 --> UC8 
+
+@enduml
