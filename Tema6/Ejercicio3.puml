@@ -23,15 +23,17 @@ Obrero --> UC3
 Obrero --> UC4
 Obrero --> UC5
 
-Encargado --> UC6
-Encargado --> UC3
+Encargado --> UC7
+Encargado --> UC8
+Encargado --> UC9
+Encargado --> UC31
 
 
-UC6 --> UC7 : <<extend>>\n[Si eres Encargado]
-UC6 --> UC8 : <<extend>>\n[Si eres Encargado]
-UC6 --> UC9 : <<extend>>\n[Si eres Encargado]
+UC31 -->UC3 
+UC7 --> UC6
+UC8 --> UC6
+UC9 --> UC6
 
-UC3 ..> UC31 : <<extend>>\n[Si eres Encargado]
 UC1 ..> UC6 : <<extend>>\n[Si es necesario]
 
 
