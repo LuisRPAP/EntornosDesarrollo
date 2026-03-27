@@ -1,0 +1,65 @@
+@startuml
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+class "Miembro (Guardia)" as miembro {
+    + id_miembro : INT [PK]
+    --
+    nombre_real : VARCHAR(100)
+    apodo : VARCHAR(50) [Unique]
+    rango : ENUM ('Maestre', 'Emerito', 'Sargento', 'Guardia')
+    es_maestre_activo : BOOLEAN
+    puntos_gracia : INT (0-100)
+    estado_honor : VARCHAR ('Activo', 'Infame')
+}
+
+class "Seccion_Maestranza" as seccion {
+    + id_seccion : INT [PK]
+    --
+    nombre_seccion : VARCHAR(50)
+    id_responsable : INT [FK -> miembro.id_miembro]
+}
+
+class "Pertrecho (Activo)" as pertrecho {
+    + id_pertrecho : INT [PK]
+    --
+    id_seccion : INT [FK -> seccion.id_seccion]
+    descripcion : TEXT
+    integridad : INT (0-100)
+    estado_ia : VARCHAR ('Validado', 'Dudoso')
+    token_qr : VARCHAR(100)
+}
+
+class "Historico_Alarde" as alarde {
+    + id_alarde : INT [PK]
+    --
+    id_guardia : INT [FK -> miembro.id_miembro]
+    id_pertrecho : INT [FK -> pertrecho.id_pertrecho]
+    id_autorizador : INT [FK -> miembro.id_miembro]
+    fecha_salida : TIMESTAMP
+    fecha_entrada : TIMESTAMP
+    observaciones : TEXT
+}
+
+class "Permiso_Suplencia" as permiso {
+    + id_permiso : INT [PK]
+    --
+    id_emisor_maestre : INT [FK -> miembro.id_miembro]
+    id_receptor_emerito : INT [FK -> miembro.id_miembro]
+    fecha_inicio : TIMESTAMP
+    fecha_fin : TIMESTAMP
+    activo : BOOLEAN
+}
+
+miembro "1" -- "0..*" seccion : "dirige"
+seccion "1" -- "0..*" pertrecho : "contiene"
+miembro "1" -- "0..*" alarde : "solicita"
+miembro "1" -- "0..*" alarde : "autoriza"
+pertrecho "1" -- "0..*" alarde : "es prestado"
+miembro "1" -- "0..*" permiso : "otorga/recibe"
+
+@enduml
