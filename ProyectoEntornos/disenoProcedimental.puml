@@ -1,0 +1,26 @@
+plantuml
+@startuml
+autonumber
+actor Maestre
+participant "Interfaz: Mesa de Alarde" as UI
+participant "Controlador: IA_Vision" as IA
+participant "Repositorio: BaseDatos" as BD
+
+Maestre -> UI: Sube paquete de fotos (Alta Masiva)
+UI -> IA: Procesar imágenes
+IA -> IA: Analizar patrones (Textil/Metal)
+IA --> UI: Devuelve propuestas de categoría
+UI -> Maestre: Muestra cuadrícula de activos "Pendientes"
+
+alt Categorías Correctas
+    Maestre -> UI: Confirmar selección masiva
+    UI -> BD: Guardar activos como "Validados"
+else Categoría Errónea
+    Maestre -> UI: Seleccionar activos erróneos
+    Maestre -> UI: Arrastrar a categoría correcta
+    UI -> BD: Actualizar categoría y guardar
+end
+
+BD --> UI: Confirmación de registro
+UI --> Maestre: Muestra "Alarde Actualizado"
+@enduml

@@ -1,0 +1,65 @@
+@startuml
+' Forzamos la dirección horizontal
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+header Sistema RenaceGest - Estructura de Roles Vertical
+footer Consolidación de Diseño (6 Meses)
+
+' Definición de Actores alineados a la izquierda
+actor "Maestre\n(Admin)" as Maestre
+actor "Sargento\n(Encargado)" as Sargento
+actor "Guardia\n(Miembro)" as Guardia
+actor "Amigo\n(Público)" as Publico
+
+' Truco para alineación vertical perfecta a la izquierda
+Maestre -[hidden]down- Sargento
+Sargento -[hidden]down- Guardia
+Guardia -[hidden]down- Publico
+
+' Jerarquía de herencia (las flechas indican quién es quién)
+Maestre --|> Sargento
+Sargento --|> Guardia
+Guardia --|> Publico
+
+rectangle "Sistema RenaceGest" {
+  
+  package "Nivel Público" #F9F9F9 {
+    usecase "Consultar Galería QR" as UC1
+    usecase "Etiquetar Fotos Sociales" as UC2
+  }
+
+  package "Nivel Membresía" #E3F2FD {
+    usecase "Ver Gracia e Infamia" as UC3
+    usecase "Consultar sus Alardes" as UC4
+  }
+
+  package "Nivel Logística" #FFF3E0 {
+    usecase "Alta IA de Pertrechos" as UC5
+    usecase "Gestionar Préstamos" as UC6
+    usecase "Aplicar Tachas/Puntos" as UC7
+  }
+  
+  package "Nivel Gobierno" #F1F8E9 {
+    usecase "Gestión de Sargentos/Guardias" as UC8
+    usecase "Validación Masiva de IA" as UC9
+  }
+}
+
+' Conexiones a los niveles mínimos
+Publico --> UC1
+Publico --> UC2
+
+Guardia --> UC3
+Guardia --> UC4
+
+Sargento --> UC5
+Sargento --> UC6
+Sargento --> UC7
+
+Maestre --> UC8
+Maestre --> UC9
+
+@enduml
