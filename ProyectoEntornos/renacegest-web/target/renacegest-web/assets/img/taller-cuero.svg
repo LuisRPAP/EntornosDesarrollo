@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Ilustracion de taller artesanal">
+  <defs>
+    <linearGradient id="wall" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f0ddba"/>
+      <stop offset="100%" stop-color="#d6b783"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#wall)"/>
+  <rect x="120" y="180" width="1360" height="580" rx="26" fill="#6a4121" fill-opacity="0.22"/>
+
+  <g fill="#6a4121" fill-opacity="0.8">
+    <rect x="220" y="260" width="320" height="30" rx="12"/>
+    <rect x="220" y="360" width="380" height="30" rx="12"/>
+    <rect x="220" y="460" width="420" height="30" rx="12"/>
+    <rect x="220" y="560" width="360" height="30" rx="12"/>
+  </g>
+
+  <g fill="#8a5a2b" fill-opacity="0.75">
+    <circle cx="1160" cy="390" r="170"/>
+    <rect x="1030" y="520" width="260" height="150" rx="24"/>
+  </g>
+
+  <g stroke="#f3e2c3" stroke-width="20" stroke-linecap="round" stroke-opacity="0.45">
+    <line x1="1025" y1="390" x2="1295" y2="390"/>
+    <line x1="1160" y1="255" x2="1160" y2="525"/>
+  </g>
+</svg>

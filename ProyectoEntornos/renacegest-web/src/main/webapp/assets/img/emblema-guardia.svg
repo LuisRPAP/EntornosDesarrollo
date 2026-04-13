@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" role="img" aria-label="Emblema ornamental">
+  <defs>
+    <radialGradient id="metal" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#f5e6c6"/>
+      <stop offset="55%" stop-color="#d2b67f"/>
+      <stop offset="100%" stop-color="#8a5a2b"/>
+    </radialGradient>
+    <linearGradient id="shadow" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#4b3018" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#4b3018" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="450" cy="450" r="410" fill="none" stroke="url(#metal)" stroke-width="28"/>
+  <circle cx="450" cy="450" r="355" fill="none" stroke="#b3884e" stroke-width="6" stroke-dasharray="8 12"/>
+
+  <path d="M450 170L535 360H735L573 482L635 690L450 566L265 690L327 482L165 360H365Z"
+        fill="none" stroke="#8a5a2b" stroke-width="22" stroke-linejoin="round"/>
+
+  <path d="M450 250L500 370H620L525 445L562 560L450 494L338 560L375 445L280 370H400Z"
+        fill="#8a5a2b" fill-opacity="0.12"/>
+
+  <rect x="415" y="210" width="70" height="480" rx="18" fill="#8a5a2b"/>
+  <rect x="260" y="415" width="380" height="70" rx="18" fill="#8a5a2b"/>
+  <rect x="435" y="130" width="30" height="640" rx="12" fill="#f5e6c6" fill-opacity="0.45"/>
+
+  <circle cx="450" cy="450" r="130" fill="url(#shadow)"/>
+</svg>

@@ -1,4 +1,4 @@
-@startuml
+@startuml casos_de_uso_renacegest
 ' Forzamos la dirección horizontal
 left to right direction
 skinparam actorStyle awesome
@@ -28,38 +28,69 @@ rectangle "Sistema RenaceGest" {
   
   package "Nivel Público" #F9F9F9 {
     usecase "Consultar Galería QR" as UC1
+    usecase "Consultar Historia del Pertrecho" as UC14
     usecase "Etiquetar Fotos Sociales" as UC2
+    usecase "Ocultar Datos Internos" as UC15
   }
 
   package "Nivel Membresía" #E3F2FD {
     usecase "Ver Gracia e Infamia" as UC3
     usecase "Consultar sus Alardes" as UC4
+    usecase "Bloqueo por Infamia (<20)" as UC16
+    usecase "Unirse a Misiones" as UC17
   }
 
   package "Nivel Logística" #FFF3E0 {
-    usecase "Alta IA de Pertrechos" as UC5
+    usecase "Alta IA de Pertrechos (>80%)" as UC5
     usecase "Gestionar Préstamos" as UC6
     usecase "Aplicar Tachas/Puntos" as UC7
+    usecase "Registrar Incidencias" as UC10
+    usecase "Gestionar Calendario de Actos" as UC11
+    usecase "Gestionar Grupos de Trabajo" as UC18
   }
   
   package "Nivel Gobierno" #F1F8E9 {
     usecase "Gestión de Sargentos/Guardias" as UC8
-    usecase "Validación Masiva de IA" as UC9
+    usecase "Validación Masiva de IA (<=80%)" as UC9
+    usecase "Auditoría de Trazabilidad" as UC12
+    usecase "Notificar Cambios Relevantes" as UC13
+    usecase "Enviar Mensaje a Grupo" as UC19
+    usecase "Enviar Mensaje a Todos" as UC20
   }
 }
 
 ' Conexiones a los niveles mínimos
 Publico --> UC1
+Publico --> UC14
 Publico --> UC2
 
 Guardia --> UC3
 Guardia --> UC4
+Guardia --> UC17
 
 Sargento --> UC5
 Sargento --> UC6
 Sargento --> UC7
+Sargento --> UC10
+Sargento --> UC11
+Sargento --> UC18
 
 Maestre --> UC8
 Maestre --> UC9
+Maestre --> UC11
+Maestre --> UC12
+Maestre --> UC13
+Maestre --> UC19
+Maestre --> UC20
+
+UC1 .> UC15 : <<include>>
+UC14 .> UC15 : <<include>>
+UC6 .> UC16 : <<include>>
+UC6 .> UC13 : <<include>>
+UC10 .> UC13 : <<include>>
+UC9 .> UC12 : <<include>>
+UC18 .> UC17 : <<include>>
+UC19 .> UC13 : <<include>>
+UC20 .> UC13 : <<include>>
 
 @enduml

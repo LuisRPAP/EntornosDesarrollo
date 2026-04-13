@@ -1,0 +1,30 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "run-renacegest-web",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"jetty:run",
+				"-q"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "package-renacegest-web",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"package"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$maven"
+			],
+			"group": "build"
+		}
+	]
+}

@@ -1,4 +1,4 @@
-@startuml
+@startuml entidad_relacion_renacegest
 skinparam linetype ortho
 skinparam class {
     BackgroundColor White
@@ -30,7 +30,9 @@ class "Pertrecho (Activo)" as pertrecho {
     id_seccion : INT [FK -> seccion.id_seccion]
     descripcion : TEXT
     integridad : INT (0-100)
+    tipo_sensible : VARCHAR ('General', 'Armeria', 'Caballeria')
     estado_ia : VARCHAR ('Validado', 'Dudoso')
+    confianza_ia : DECIMAL (0.00-1.00)
     token_qr : VARCHAR(100)
 }
 
@@ -42,6 +44,9 @@ class "Historico_Alarde" as alarde {
     id_autorizador : INT [FK -> miembro.id_miembro]
     fecha_salida : TIMESTAMP
     fecha_entrada : TIMESTAMP
+    evidencia_foto_salida : VARCHAR(255)
+    evidencia_foto_entrada : VARCHAR(255)
+    penalizacion_aplicada : INT
     observaciones : TEXT
 }
 
@@ -55,11 +60,107 @@ class "Permiso_Suplencia" as permiso {
     activo : BOOLEAN
 }
 
+class "Acto_Evento" as acto {
+    + id_acto : INT [PK]
+    --
+    titulo : VARCHAR(100)
+    fecha_evento : TIMESTAMP
+    ubicacion : VARCHAR(120)
+    estado : VARCHAR ('Planificado', 'EnCurso', 'Finalizado', 'Cancelado')
+    id_creador : INT [FK -> miembro.id_miembro]
+}
+
+class "Incidencia_Alarde" as incidencia {
+    + id_incidencia : INT [PK]
+    --
+    id_alarde : INT [FK -> alarde.id_alarde]
+    id_reportante : INT [FK -> miembro.id_miembro]
+    tipo : VARCHAR ('Retraso', 'Daño', 'Pérdida', 'Observación')
+    descripcion : TEXT
+    severidad : VARCHAR ('Baja', 'Media', 'Alta')
+    estado : VARCHAR ('Abierta', 'EnRevision', 'Cerrada')
+    fecha_reporte : TIMESTAMP
+}
+
+class "Notificacion" as notificacion {
+    + id_notificacion : INT [PK]
+    --
+    id_miembro_destino : INT [FK -> miembro.id_miembro]
+    categoria : VARCHAR ('Prestamo', 'Incidencia', 'Acto', 'Sistema')
+    mensaje : VARCHAR(255)
+    leida : BOOLEAN
+    fecha_envio : TIMESTAMP
+}
+
+class "Acceso_QR" as accesoqr {
+    + id_acceso : INT [PK]
+    --
+    id_pertrecho : INT [FK -> pertrecho.id_pertrecho]
+    tipo_vista : VARCHAR ('Publica', 'Interna')
+    muestra_historia : BOOLEAN
+    oculta_datos_internos : BOOLEAN
+    fecha_ultimo_acceso : TIMESTAMP
+}
+
+class "Grupo_Mision" as grupo {
+    + id_grupo : INT [PK]
+    --
+    nombre_grupo : VARCHAR(80)
+    descripcion : TEXT
+    tipo : VARCHAR ('GrupoTrabajo', 'Mision')
+    id_jefe_equipo : INT [FK -> miembro.id_miembro]
+    creado_por : INT [FK -> miembro.id_miembro]
+    activo : BOOLEAN
+}
+
+class "Grupo_Mision_Miembro" as grupomiembro {
+    + id_grupo_miembro : INT [PK]
+    --
+    id_grupo : INT [FK -> grupo.id_grupo]
+    id_miembro : INT [FK -> miembro.id_miembro]
+    rol_en_grupo : VARCHAR ('JefeEquipo', 'Miembro')
+    puede_modificar_miembros : BOOLEAN
+    fecha_alta : TIMESTAMP
+}
+
+class "Mensaje_Comunicacion" as mensaje {
+    + id_mensaje : INT [PK]
+    --
+    id_emisor : INT [FK -> miembro.id_miembro]
+    id_grupo : INT [FK -> grupo.id_grupo]
+    contenido : TEXT
+    es_broadcast : BOOLEAN
+    visible_para_todos : BOOLEAN
+    fecha_envio : TIMESTAMP
+}
+
+class "Auditoria_Cambio" as auditoria {
+    + id_auditoria : INT [PK]
+    --
+    id_actor : INT [FK -> miembro.id_miembro]
+    entidad_afectada : VARCHAR(50)
+    id_registro_afectado : INT
+    accion : VARCHAR ('Alta', 'Actualizacion', 'Baja', 'Validacion')
+    detalle : TEXT
+    fecha_cambio : TIMESTAMP
+}
+
 miembro "1" -- "0..*" seccion : "dirige"
 seccion "1" -- "0..*" pertrecho : "contiene"
 miembro "1" -- "0..*" alarde : "solicita"
 miembro "1" -- "0..*" alarde : "autoriza"
 pertrecho "1" -- "0..*" alarde : "es prestado"
 miembro "1" -- "0..*" permiso : "otorga/recibe"
+miembro "1" -- "0..*" acto : "crea"
+alarde "1" -- "0..*" incidencia : "genera"
+miembro "1" -- "0..*" incidencia : "reporta"
+miembro "1" -- "0..*" notificacion : "recibe"
+miembro "1" -- "0..*" auditoria : "ejecuta"
+pertrecho "1" -- "0..*" accesoqr : "expone"
+miembro "1" -- "0..*" grupo : "crea/dirige"
+grupo "1" -- "0..*" grupomiembro : "contiene"
+miembro "1" -- "0..*" grupomiembro : "participa"
+grupo "1" -- "0..*" mensaje : "recibe"
+miembro "1" -- "0..*" mensaje : "emite"
 
 @enduml

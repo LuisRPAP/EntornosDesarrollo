@@ -1,4 +1,4 @@
-@startuml
+@startuml guardias_santiago_casos_uso
 left to right direction
 
 actor "Maestre / Junta" as Admin

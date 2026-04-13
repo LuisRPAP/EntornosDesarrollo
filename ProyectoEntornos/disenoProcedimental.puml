@@ -1,26 +1,79 @@
-plantuml
-@startuml
+@startuml secuencia_alta_y_trazabilidad
 autonumber
 actor Maestre
+actor Sargento
+actor Guardia
 participant "Interfaz: Mesa de Alarde" as UI
 participant "Controlador: IA_Vision" as IA
 participant "Repositorio: BaseDatos" as BD
+participant "Servicio: Notificaciones" as NTF
+participant "Servicio: Mensajeria" as MSG
 
 Maestre -> UI: Sube paquete de fotos (Alta Masiva)
 UI -> IA: Procesar imágenes
 IA -> IA: Analizar patrones (Textil/Metal)
-IA --> UI: Devuelve propuestas de categoría
-UI -> Maestre: Muestra cuadrícula de activos "Pendientes"
+IA --> UI: Devuelve categoria + confianza
+UI -> Maestre: Muestra activos con score de confianza
 
-alt Categorías Correctas
+alt Confianza > 80%
+    UI -> BD: Clasificar automaticamente en maestranza
+else Confianza <= 80%
+    UI -> Maestre: Requiere validacion masiva o individual
     Maestre -> UI: Confirmar selección masiva
     UI -> BD: Guardar activos como "Validados"
-else Categoría Errónea
     Maestre -> UI: Seleccionar activos erróneos
     Maestre -> UI: Arrastrar a categoría correcta
     UI -> BD: Actualizar categoría y guardar
 end
 
+Sargento -> UI: Registrar incidencia de alarde
+UI -> BD: Insertar incidencia y asociar alarde
+BD --> UI: Incidencia registrada
+
+Guardia -> UI: Solicitar prestamo de pertrecho sensible
+UI -> BD: Consultar puntos_gracia y estado_honor
+BD --> UI: puntos_gracia, estado_honor
+
+alt puntos_gracia < 20 o estado_honor = "Infame"
+    UI --> Guardia: Prestamo denegado (bloqueo por infamia)
+else estado apto
+    UI -> BD: Registrar salida en historico_alarde
+    BD --> UI: Prestamo autorizado
+    UI --> Guardia: Prestamo confirmado
+end
+
+Guardia -> UI: Registrar devolucion con evidencia
+UI -> BD: Actualizar integridad y cierre de alarde
+
+alt Integridad < 70%
+    UI -> BD: Restar puntos de gracia (tacha)
+    UI -> NTF: Notificar incidencias a responsables
+else Integridad >= 70%
+    UI -> BD: Mantener o bonificar puntos
+end
+
+UI -> NTF: Publicar aviso a responsables
+NTF -> BD: Guardar notificaciones pendientes
+BD --> NTF: Confirmación
+
+UI -> BD: Registrar auditoría del proceso
+BD --> UI: Trazabilidad persistida
+
 BD --> UI: Confirmación de registro
 UI --> Maestre: Muestra "Alarde Actualizado"
+
+Maestre -> UI: Enviar mensaje a un grupo o a todos
+UI -> MSG: Publicar mensaje broadcast
+MSG -> BD: Guardar mensaje y destino
+BD --> MSG: Mensaje persistido
+MSG -> NTF: Notificar a miembros del grupo
+NTF --> UI: Entrega confirmada
+
+Sargento -> UI: Crear o modificar una mision
+UI -> BD: Crear grupo y asignar jefe de equipo
+BD --> UI: Grupo creado
+
+Guardia -> UI: Solicitar alta o baja del grupo
+UI -> BD: Validar permiso del jefe de equipo
+BD --> UI: Cambio de membresia aplicado
 @enduml
