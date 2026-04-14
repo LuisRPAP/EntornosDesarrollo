@@ -19,6 +19,10 @@
         <div class="hero-actions">
             <a class="button button-primary" href="${pageContext.request.contextPath}/grupos">Gestionar grupos</a>
             <a class="button button-secondary" href="${pageContext.request.contextPath}/mensajes">Mensajería</a>
+            <a class="button button-secondary" href="${pageContext.request.contextPath}/listados">Listados avanzados</a>
+            <c:if test="${currentRole == 'Maestre' || currentRole == 'Sargento'}">
+                <a class="button button-secondary" href="${pageContext.request.contextPath}/importacion">Importacion masiva</a>
+            </c:if>
         </div>
     </header>
 

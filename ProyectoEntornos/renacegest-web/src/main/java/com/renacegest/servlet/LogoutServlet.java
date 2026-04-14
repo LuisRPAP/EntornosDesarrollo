@@ -1,5 +1,7 @@
 package com.renacegest.servlet;
 
+import com.renacegest.db.DBConnection;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import java.io.IOException;
 public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        DBConnection.clearCurrentProfile();
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();

@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 
 import jakarta.servlet.RequestDispatcher;
@@ -15,8 +14,6 @@ import java.util.stream.Collectors;
 
 @WebServlet(urlPatterns = {"/home"})
 public class HomeServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
@@ -31,6 +28,7 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("canManageGroups", "Maestre".equalsIgnoreCase(currentRole) || "Sargento".equalsIgnoreCase(currentRole));
         request.setAttribute("canManageInventario", "Maestre".equalsIgnoreCase(currentRole) || "Sargento".equalsIgnoreCase(currentRole));
 
+        RenaceGestRepository repository = repository(request);
         request.setAttribute("guardias", repository.findAllGuardias());
         request.setAttribute("grupos", repository.findAllGrupos());
         request.setAttribute("mensajes", repository.findAllMensajes().stream().limit(5).collect(Collectors.toList()));
@@ -41,8 +39,13 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("totalPertrechos", repository.findAllPertrechos().size());
         request.setAttribute("totalAlardes", repository.findAllAlardes().size());
         request.setAttribute("totalTickets", repository.getTotalTicketsMaestranza());
+        request.setAttribute("currentDbProfile", AuthUtil.getCurrentDbProfile(request));
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/index.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

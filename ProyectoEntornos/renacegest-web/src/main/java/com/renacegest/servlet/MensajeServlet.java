@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 
 import jakarta.servlet.RequestDispatcher;
@@ -13,8 +12,6 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/mensajes"})
 public class MensajeServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
@@ -31,6 +28,7 @@ public class MensajeServlet extends HttpServlet {
         }
 
         String estado;
+        RenaceGestRepository repository = repository(request);
         try {
             Long emisorId = AuthUtil.getCurrentUserId(request);
             if (emisorId == null) {
@@ -62,11 +60,16 @@ public class MensajeServlet extends HttpServlet {
     }
 
     private void cargarVista(HttpServletRequest request, HttpServletResponse response, String estado) throws ServletException, IOException {
+        RenaceGestRepository repository = repository(request);
         request.setAttribute("estado", estado);
         request.setAttribute("mensajes", repository.findAllMensajes());
         request.setAttribute("grupos", repository.findAllGrupos());
         request.setAttribute("canBroadcast", AuthUtil.hasAnyRole(request, "Maestre"));
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/mensajes.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

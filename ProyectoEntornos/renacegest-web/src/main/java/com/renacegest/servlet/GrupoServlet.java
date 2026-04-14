@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 import com.renacegest.model.MiembroGrupo;
 
@@ -17,8 +16,6 @@ import java.util.Map;
 
 @WebServlet(urlPatterns = {"/grupos"})
 public class GrupoServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
@@ -46,6 +43,7 @@ public class GrupoServlet extends HttpServlet {
 
         String accion = request.getParameter("accion");
         String mensajeEstado;
+        RenaceGestRepository repository = repository(request);
 
         try {
             if ("crear".equalsIgnoreCase(accion)) {
@@ -82,6 +80,7 @@ public class GrupoServlet extends HttpServlet {
     }
 
     private void cargarVista(HttpServletRequest request, HttpServletResponse response, String mensajeEstado) throws ServletException, IOException {
+        RenaceGestRepository repository = repository(request);
         Map<Long, List<MiembroGrupo>> miembrosPorGrupo = new HashMap<>();
         repository.findAllGrupos().forEach(grupo -> miembrosPorGrupo.put(grupo.getId(), repository.findMiembrosByGrupo(grupo.getId())));
         request.setAttribute("grupos", repository.findAllGrupos());
@@ -91,5 +90,9 @@ public class GrupoServlet extends HttpServlet {
         request.setAttribute("canManageGroups", AuthUtil.hasAnyRole(request, "Maestre", "Sargento"));
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/grupos.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 import com.renacegest.model.Pertrecho;
 
@@ -14,10 +13,9 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/qr"})
 public class QrPublicoServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        RenaceGestRepository repository = repository(request);
         String token = request.getParameter("token");
         Pertrecho pertrecho = repository.findPertrechoByTokenQr(token);
 
@@ -29,5 +27,9 @@ public class QrPublicoServlet extends HttpServlet {
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/qr.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

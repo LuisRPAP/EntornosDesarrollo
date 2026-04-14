@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public final class AuthUtil {
+    public static final String SESSION_DB_PROFILE = "currentDbProfile";
+
     private AuthUtil() {
     }
 
@@ -50,5 +52,18 @@ public final class AuthUtil {
     public static boolean hasAnyRole(HttpServletRequest request, String... allowedRoles) {
         String role = getCurrentRole(request);
         return role != null && Arrays.stream(allowedRoles).anyMatch(allowed -> allowed.equalsIgnoreCase(role));
+    }
+
+    public static String normalizeDbProfile(String rawProfile) {
+        return "REAL".equalsIgnoreCase(rawProfile) ? "REAL" : "PRUEBA";
+    }
+
+    public static String getCurrentDbProfile(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return "PRUEBA";
+        }
+        Object raw = session.getAttribute(SESSION_DB_PROFILE);
+        return normalizeDbProfile(raw == null ? null : raw.toString());
     }
 }

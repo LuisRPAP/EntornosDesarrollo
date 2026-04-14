@@ -32,7 +32,11 @@
 			</c:if>
 			<a class="button button-primary" href="${pageContext.request.contextPath}/grupos">${canManageGroups ? 'Gestionar grupos' : 'Consultar grupos'}</a>
 			<a class="button button-secondary" href="${pageContext.request.contextPath}/mensajes">Mensajería</a>
+			<a class="button button-secondary" href="${pageContext.request.contextPath}/listados">Listados avanzados</a>
 			<a class="button button-primary" href="${pageContext.request.contextPath}/inventario">${canManageInventario ? 'Inventario y alardes' : 'Inventario (solo lectura)'}</a>
+			<c:if test="${canManageInventario}">
+				<a class="button button-secondary" href="${pageContext.request.contextPath}/importacion">Importacion masiva</a>
+			</c:if>
 			<a class="button button-secondary" href="${pageContext.request.contextPath}/amigos">Acceso publico QR</a>
 		</div>
 	</header>

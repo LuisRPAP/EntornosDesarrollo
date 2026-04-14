@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 
 import jakarta.servlet.RequestDispatcher;
@@ -15,8 +14,6 @@ import java.util.List;
 
 @WebServlet(urlPatterns = {"/inventario"})
 public class InventarioServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
@@ -52,6 +49,7 @@ public class InventarioServlet extends HttpServlet {
         }
 
         String estado;
+        RenaceGestRepository repository = repository(request);
 
         try {
             if ("crearSeccion".equalsIgnoreCase(accion)) {
@@ -134,6 +132,7 @@ public class InventarioServlet extends HttpServlet {
         String role = AuthUtil.getCurrentRole(request);
         boolean canEditInventory = role != null && ("Maestre".equalsIgnoreCase(role) || "Sargento".equalsIgnoreCase(role));
         boolean canDeletePertrecho = "Maestre".equalsIgnoreCase(role);
+        RenaceGestRepository repository = repository(request);
 
         request.setAttribute("estado", estado);
         request.setAttribute("guardias", repository.findAllGuardias());
@@ -149,5 +148,9 @@ public class InventarioServlet extends HttpServlet {
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/inventario.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

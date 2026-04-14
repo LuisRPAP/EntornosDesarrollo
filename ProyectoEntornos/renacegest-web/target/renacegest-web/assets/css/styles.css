@@ -369,6 +369,45 @@ textarea:focus {
     font-weight: 700;
 }
 
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.gallery-card {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255, 250, 241, 0.97), rgba(246, 231, 201, 0.94));
+    border: 1px solid rgba(95, 56, 21, 0.18);
+    box-shadow: var(--shadow);
+}
+
+.gallery-image {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    border-bottom: 1px solid rgba(95, 56, 21, 0.16);
+}
+
+.gallery-body {
+    padding: 18px;
+    display: grid;
+    gap: 12px;
+}
+
+.gallery-body h3 {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 @media (max-width: 720px) {
     .hero, .page-head, .list-item, .message-meta {
         flex-direction: column;
@@ -390,5 +429,13 @@ textarea:focus {
 
     .hero, .page-head, .panel {
         padding: 18px;
+    }
+
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .gallery-image {
+        height: 200px;
     }
 }

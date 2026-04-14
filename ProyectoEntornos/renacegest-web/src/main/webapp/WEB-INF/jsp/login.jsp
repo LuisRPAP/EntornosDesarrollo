@@ -41,6 +41,13 @@
         <h2>Iniciar sesion</h2>
         <form class="form-grid" method="post" action="${pageContext.request.contextPath}/login">
             <label>
+                Entorno de datos
+                <select name="dbProfile" required>
+                    <option value="PRUEBA" ${selectedDbProfile == 'PRUEBA' ? 'selected' : ''}>PRUEBA (recomendado para test)</option>
+                    <option value="REAL" ${selectedDbProfile == 'REAL' ? 'selected' : ''}>REAL (datos definitivos)</option>
+                </select>
+            </label>
+            <label>
                 Rol
                 <select name="role" required>
                     <option value="">Selecciona rol</option>
@@ -65,7 +72,7 @@
             </label>
             <button class="button button-primary" type="submit">Entrar</button>
         </form>
-        <p class="lead">Credenciales demo: MaestreLupo/maestre123, SargentoCesar/sargento123, GuardiaAna/guardia123.</p>
+        <p class="lead">Selecciona PRUEBA para validar flujos sin afectar el entorno REAL.</p>
     </section>
 </div>
 </body>

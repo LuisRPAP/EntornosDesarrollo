@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 
 import jakarta.servlet.RequestDispatcher;
@@ -13,8 +12,6 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/guardias"})
 public class GuardiaServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AuthUtil.requireAnyRole(request, response, "Maestre")) {
@@ -38,6 +35,7 @@ public class GuardiaServlet extends HttpServlet {
 
         String accion = request.getParameter("accion");
         String estado;
+        RenaceGestRepository repository = repository(request);
 
         try {
             if ("crear".equalsIgnoreCase(accion)) {
@@ -81,8 +79,12 @@ public class GuardiaServlet extends HttpServlet {
 
     private void cargarVista(HttpServletRequest request, HttpServletResponse response, String estado) throws ServletException, IOException {
         request.setAttribute("estado", estado);
-        request.setAttribute("guardias", repository.findAllGuardias());
+        request.setAttribute("guardias", repository(request).findAllGuardias());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/guardias.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

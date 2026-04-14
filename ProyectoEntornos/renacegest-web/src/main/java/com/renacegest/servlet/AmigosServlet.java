@@ -1,6 +1,5 @@
 package com.renacegest.servlet;
 
-import com.renacegest.dao.InMemoryRenaceGestRepository;
 import com.renacegest.dao.RenaceGestRepository;
 
 import jakarta.servlet.RequestDispatcher;
@@ -13,8 +12,6 @@ import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/amigos"})
 public class AmigosServlet extends HttpServlet {
-    private final RenaceGestRepository repository = InMemoryRenaceGestRepository.getInstance();
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         cargarVista(request, response, null);
@@ -24,6 +21,7 @@ public class AmigosServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String accion = request.getParameter("accion");
         String estado;
+        RenaceGestRepository repository = repository(request);
 
         try {
             if ("etiquetar".equalsIgnoreCase(accion)) {
@@ -54,10 +52,15 @@ public class AmigosServlet extends HttpServlet {
     }
 
     private void cargarVista(HttpServletRequest request, HttpServletResponse response, String estado) throws ServletException, IOException {
+        RenaceGestRepository repository = repository(request);
         request.setAttribute("estado", estado);
         request.setAttribute("pertrechos", repository.findPertrechosPublicos());
         request.setAttribute("fotosGaleria", repository.findGaleriaPublica());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/amigos.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private RenaceGestRepository repository(HttpServletRequest request) {
+        return SessionRepositoryResolver.resolve(request);
     }
 }

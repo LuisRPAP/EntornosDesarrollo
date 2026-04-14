@@ -1,0 +1,51 @@
+seccionNombre;descripcion;integridad;estadoIa;disponible
+Seccion 01;Espada de prueba 01;95;Validado;true
+Seccion 02;Escudo de prueba 02;88;Validado;true
+Seccion 03;Casco de prueba 03;76;Pendiente;true
+Seccion 04;Capa de prueba 04;82;Dudoso;false
+Seccion 05;Botas de prueba 05;91;Validado;true
+Seccion 06;Morrion de prueba 06;67;Pendiente;true
+Seccion 07;Lanza de prueba 07;54;Pendiente;true
+Seccion 08;Pergamino de prueba 08;98;Validado;true
+Seccion 09;Tahalí de prueba 09;73;Dudoso;false
+Seccion 10;Cinturon de prueba 10;89;Validado;true
+Seccion 11;Armadura de prueba 11;92;Validado;true
+Seccion 12;Guantelete de prueba 12;84;Pendiente;true
+Seccion 13;Sello de prueba 13;97;Validado;true
+Seccion 14;Farol de prueba 14;63;Pendiente;true
+Seccion 15;Libro de prueba 15;99;Validado;true
+Seccion 16;Mapa de prueba 16;71;Dudoso;true
+Seccion 17;Arco de prueba 17;86;Validado;false
+Seccion 18;Flecha de prueba 18;78;Pendiente;true
+Seccion 19;Escama de prueba 19;90;Validado;true
+Seccion 20;Casaca de prueba 20;65;Pendiente;true
+Seccion 21;Lanza corta 21;93;Validado;true
+Seccion 22;Daga de prueba 22;81;Dudoso;false
+Seccion 23;Sellos de prueba 23;96;Validado;true
+Seccion 24;Cofre de prueba 24;74;Pendiente;true
+Seccion 25;Broche de prueba 25;87;Validado;true
+Seccion 26;Cinta de prueba 26;59;Pendiente;true
+Seccion 27;Manto de prueba 27;91;Validado;true
+Seccion 28;Baston de prueba 28;68;Pendiente;false
+Seccion 29;Anillo de prueba 29;94;Validado;true
+Seccion 30;Torno de prueba 30;77;Dudoso;true
+Seccion 31;Escuadra de prueba 31;83;Pendiente;true
+Seccion 32;Pual de prueba 32;88;Validado;true
+Seccion 33;Linterna de prueba 33;72;Pendiente;true
+Seccion 34;Timbre de prueba 34;98;Validado;true
+Seccion 35;Cuerno de prueba 35;85;Pendiente;true
+Seccion 36;Pergamino mayor 36;90;Validado;true
+Seccion 37;Silla de prueba 37;61;Pendiente;false
+Seccion 38;Mesa de prueba 38;79;Dudoso;true
+Seccion 39;Vara de prueba 39;92;Validado;true
+Seccion 40;Cascabel de prueba 40;66;Pendiente;true
+Seccion 41;Placa de prueba 41;95;Validado;true
+Seccion 42;Casulla de prueba 42;70;Pendiente;true
+Seccion 43;Cinta mayor 43;84;Validado;true
+Seccion 44;Cubierta de prueba 44;64;Pendiente;true
+Seccion 45;Llave de prueba 45;97;Validado;true
+Seccion 46;Reloj de prueba 46;75;Dudoso;true
+Seccion 47;Bandera de prueba 47;89;Validado;false
+Seccion 48;Cuerda de prueba 48;58;Pendiente;true
+Seccion 49;Guia de prueba 49;93;Validado;true
+Seccion 50;Cuchilla de prueba 50;80;Pendiente;true
