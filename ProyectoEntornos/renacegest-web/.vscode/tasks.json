@@ -3,10 +3,10 @@
 	"tasks": [
 		{
 			"label": "run-renacegest-web",
-			"type": "shell",
+			"type": "process",
 			"command": "mvn",
 			"args": [
-				"jetty:run",
+				"org.eclipse.jetty:jetty-maven-plugin:11.0.26:run",
 				"-q"
 			],
 			"isBackground": true,
@@ -15,7 +15,7 @@
 		},
 		{
 			"label": "package-renacegest-web",
-			"type": "shell",
+			"type": "process",
 			"command": "mvn",
 			"args": [
 				"package"
