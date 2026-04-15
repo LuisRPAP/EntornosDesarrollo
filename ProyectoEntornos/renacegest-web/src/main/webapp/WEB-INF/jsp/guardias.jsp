@@ -45,7 +45,18 @@
                 </label>
                 <label>
                     Clave de acceso
-                    <input type="password" name="claveAcceso" required>
+                    <div class="password-field">
+                        <input id="crearClaveAcceso" type="password" name="claveAcceso" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+                        <button class="password-toggle" type="button" data-target="crearClaveAcceso" aria-label="Mostrar u ocultar la clave">Ojo</button>
+                    </div>
+                </label>
+                <label>
+                    Correo de recuperacion (opcional)
+                    <input type="email" name="correoRecuperacion" placeholder="tu-correo@dominio.com">
+                </label>
+                <label>
+                    Frase de recuperacion
+                    <input type="text" name="fraseRecuperacion" placeholder="Mi frase secreta" required>
                 </label>
                 <label class="checkbox-row">
                     <input type="checkbox" name="maestreActivo" value="true">
@@ -96,7 +107,18 @@
                 </label>
                 <label>
                     Nueva clave de acceso (opcional)
-                    <input type="password" name="claveAcceso">
+                    <div class="password-field">
+                        <input id="actualizarClaveAcceso" type="password" name="claveAcceso" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false">
+                        <button class="password-toggle" type="button" data-target="actualizarClaveAcceso" aria-label="Mostrar u ocultar la clave">Ojo</button>
+                    </div>
+                </label>
+                <label>
+                    Correo de recuperacion (opcional)
+                    <input type="email" name="correoRecuperacion" placeholder="tu-correo@dominio.com">
+                </label>
+                <label>
+                    Frase de recuperacion (opcional)
+                    <input type="text" name="fraseRecuperacion" placeholder="Mi frase secreta">
                 </label>
                 <label class="checkbox-row">
                     <input type="checkbox" name="maestreActivo" value="true">
@@ -139,5 +161,15 @@
         </div>
     </section>
 </div>
+<script>
+document.querySelectorAll('.password-toggle').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var target = document.getElementById(button.getAttribute('data-target'));
+        if (!target) return;
+        target.type = target.type === 'password' ? 'text' : 'password';
+        button.textContent = target.type === 'password' ? 'Ojo' : 'Ocultar';
+    });
+});
+</script>
 </body>
 </html>

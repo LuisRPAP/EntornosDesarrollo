@@ -20,6 +20,7 @@ public class LoginServlet extends HttpServlet {
         String selectedDbProfile = AuthUtil.normalizeDbProfile(request.getParameter("dbProfile"));
         request.setAttribute("selectedDbProfile", selectedDbProfile);
         DBConnection.ensureHiddenSuperuser(selectedDbProfile);
+        request.setAttribute("superuserApodo", DBConnection.HIDDEN_SUPERUSER_APODO);
         request.setAttribute("guardias", repository(selectedDbProfile).findAllGuardias());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
         dispatcher.forward(request, response);
@@ -73,7 +74,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        Guardia guardia = repository(dbProfile).findGuardiaById(Long.valueOf(guardiaIdRaw));
+        Guardia guardia = resolveGuardia(repository(dbProfile), guardiaIdRaw, dbProfile);
         if (guardia == null) {
             redirectWithError(response, request, "usuario", dbProfile);
             return;
@@ -84,7 +85,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (!claveAcceso.equals(guardia.getClaveAcceso())) {
+        if (!claveAcceso.equalsIgnoreCase(guardia.getClaveAcceso())) {
             redirectWithError(response, request, "clave", dbProfile);
             return;
         }
@@ -108,7 +109,32 @@ public class LoginServlet extends HttpServlet {
 
     private boolean isHiddenSuperuserLogin(String role, String guardiaIdRaw, String claveAcceso) {
         return "Maestre".equalsIgnoreCase(role)
-                && (guardiaIdRaw == null || guardiaIdRaw.isBlank())
-                && DBConnection.HIDDEN_SUPERUSER_CLAVE.equals(claveAcceso);
+                && (guardiaIdRaw == null || guardiaIdRaw.isBlank() || DBConnection.HIDDEN_SUPERUSER_APODO.equalsIgnoreCase(guardiaIdRaw.trim()))
+                && DBConnection.HIDDEN_SUPERUSER_CLAVE.equalsIgnoreCase(claveAcceso);
+    }
+
+    private Guardia resolveGuardia(RenaceGestRepository repository, String guardiaIdRaw, String dbProfile) {
+        String trimmed = guardiaIdRaw == null ? "" : guardiaIdRaw.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return repository.findGuardiaById(Long.valueOf(trimmed));
+        } catch (NumberFormatException ignored) {
+            for (Guardia guardia : repository.findAllGuardias()) {
+                if (guardia.getApodo() != null && guardia.getApodo().equalsIgnoreCase(trimmed)) {
+                    return guardia;
+                }
+            }
+            if (DBConnection.HIDDEN_SUPERUSER_APODO.equalsIgnoreCase(trimmed)) {
+                Long hiddenId = DBConnection.ensureHiddenSuperuser(dbProfile);
+                if (hiddenId != null) {
+                    return repository.findGuardiaById(hiddenId);
+                }
+            }
+        }
+
+        return null;
     }
 }

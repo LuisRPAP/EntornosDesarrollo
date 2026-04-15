@@ -39,27 +39,30 @@ public class GuardiaServlet extends HttpServlet {
 
         try {
             if ("crear".equalsIgnoreCase(accion)) {
-                repository.crearGuardia(
+                com.renacegest.model.Guardia guardiaCreada = repository.crearGuardia(
                         request.getParameter("nombreReal"),
                         request.getParameter("apodo"),
                         request.getParameter("rango"),
-                    request.getParameter("claveAcceso"),
+                        request.getParameter("claveAcceso"),
                         Boolean.parseBoolean(request.getParameter("maestreActivo")),
-                    currentUserId
+                        currentUserId
                 );
+                guardarRecuperacionSiCorresponde(repository, guardiaCreada == null ? null : guardiaCreada.getId(), request);
                 estado = "Guardia creado correctamente.";
             } else if ("actualizar".equalsIgnoreCase(accion)) {
+                Long guardiaId = Long.valueOf(request.getParameter("guardiaId"));
                 repository.actualizarGuardia(
-                        Long.valueOf(request.getParameter("guardiaId")),
+                        guardiaId,
                         request.getParameter("nombreReal"),
                         request.getParameter("apodo"),
                         request.getParameter("rango"),
-                    request.getParameter("claveAcceso"),
+                        request.getParameter("claveAcceso"),
                         Integer.parseInt(request.getParameter("puntosGracia")),
                         request.getParameter("estadoHonor"),
                         Boolean.parseBoolean(request.getParameter("maestreActivo")),
-                    currentUserId
+                        currentUserId
                 );
+                guardarRecuperacionSiCorresponde(repository, guardiaId, request);
                 estado = "Guardia actualizado correctamente.";
             } else if ("eliminar".equalsIgnoreCase(accion)) {
                 boolean eliminado = repository.eliminarGuardia(
@@ -86,5 +89,17 @@ public class GuardiaServlet extends HttpServlet {
 
     private RenaceGestRepository repository(HttpServletRequest request) {
         return SessionRepositoryResolver.resolve(request);
+    }
+
+    private void guardarRecuperacionSiCorresponde(RenaceGestRepository repository, Long guardiaId, HttpServletRequest request) {
+        if (guardiaId == null) {
+            return;
+        }
+
+        String correoRecuperacion = request.getParameter("correoRecuperacion");
+        String fraseRecuperacion = request.getParameter("fraseRecuperacion");
+        if (fraseRecuperacion != null && !fraseRecuperacion.isBlank()) {
+            repository.guardarDatosRecuperacionGuardia(guardiaId, correoRecuperacion, fraseRecuperacion);
+        }
     }
 }

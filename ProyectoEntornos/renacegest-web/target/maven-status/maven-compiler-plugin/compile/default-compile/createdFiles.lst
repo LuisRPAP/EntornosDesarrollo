@@ -1,5 +1,6 @@
 com\renacegest\db\DBConnection.class
 com\renacegest\model\SeccionMaestranza.class
+com\renacegest\dao\InMemoryRenaceGestRepository$RecoveryData.class
 com\renacegest\dao\MySQLRenaceGestRepository$IaSugerencia.class
 com\renacegest\servlet\QrPublicoServlet.class
 com\renacegest\model\MensajeComunicacion.class
@@ -20,6 +21,7 @@ com\renacegest\model\ResultadoClasificacionIa.class
 com\renacegest\servlet\LogoutServlet.class
 com\renacegest\model\GrupoMision.class
 com\renacegest\model\Pertrecho.class
+com\renacegest\servlet\RecuperarClaveServlet.class
 com\renacegest\servlet\ListadosServlet.class
 com\renacegest\servlet\AuthUtil.class
 com\renacegest\servlet\HomeServlet.class

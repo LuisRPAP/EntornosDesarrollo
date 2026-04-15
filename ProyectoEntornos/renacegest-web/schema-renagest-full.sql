@@ -27,6 +27,14 @@ CREATE TABLE IF NOT EXISTS guardias (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS guardias_recuperacion (
+    guardia_id BIGINT PRIMARY KEY,
+    correo_recuperacion VARCHAR(255),
+    frase_recuperacion VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (guardia_id) REFERENCES guardias(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS secciones_maestranza (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     nombre_seccion VARCHAR(100) UNIQUE NOT NULL,
@@ -163,6 +171,14 @@ CREATE TABLE IF NOT EXISTS guardias (
     estado_honor VARCHAR(50) DEFAULT 'Activo',
     maestre_activo BOOLEAN DEFAULT FALSE,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS guardias_recuperacion (
+    guardia_id BIGINT PRIMARY KEY,
+    correo_recuperacion VARCHAR(255),
+    frase_recuperacion VARCHAR(255) NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (guardia_id) REFERENCES guardias(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS secciones_maestranza (

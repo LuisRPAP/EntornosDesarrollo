@@ -34,6 +34,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     private MySQLRenaceGestRepository(String profile) {
         this.profile = profile;
         try {
+            DBConnection.ensureRecoverySupport(profile);
             DBConnection.getConnection(profile).close();
             System.out.println("MySQLRenaceGestRepository inicializado para perfil: " + profile);
         } catch (SQLException e) {
@@ -145,6 +146,67 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
         }
 
         return null;
+    }
+
+    @Override
+    public synchronized void guardarDatosRecuperacionGuardia(Long guardiaId, String correoRecuperacion, String fraseRecuperacion) {
+        if (guardiaId == null) {
+            throw new IllegalArgumentException("El guardia es obligatorio.");
+        }
+        if (fraseRecuperacion == null || fraseRecuperacion.isBlank()) {
+            throw new IllegalArgumentException("La frase de recuperacion es obligatoria.");
+        }
+
+        String sql = "INSERT INTO guardias_recuperacion (guardia_id, correo_recuperacion, frase_recuperacion) VALUES (?, ?, ?) "
+                + "ON DUPLICATE KEY UPDATE correo_recuperacion = VALUES(correo_recuperacion), frase_recuperacion = VALUES(frase_recuperacion)";
+
+        try (Connection conn = DBConnection.getConnection(profile);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, guardiaId);
+            pstmt.setString(2, correoRecuperacion == null || correoRecuperacion.isBlank() ? null : correoRecuperacion.trim());
+            pstmt.setString(3, fraseRecuperacion.trim());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al guardar datos de recuperacion: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public synchronized boolean cambiarClaveConFrase(String apodo, String fraseRecuperacion, String nuevaClave) {
+        if (apodo == null || apodo.isBlank() || fraseRecuperacion == null || fraseRecuperacion.isBlank() || nuevaClave == null || nuevaClave.isBlank()) {
+            throw new IllegalArgumentException("Faltan datos para cambiar la clave.");
+        }
+        if (nuevaClave.trim().length() < 4) {
+            throw new IllegalArgumentException("La nueva clave debe tener al menos 4 caracteres.");
+        }
+
+        String sql = "SELECT g.id AS guardia_id, r.frase_recuperacion "
+                + "FROM guardias g INNER JOIN guardias_recuperacion r ON r.guardia_id = g.id "
+                + "WHERE LOWER(g.apodo) = LOWER(?)";
+
+        try (Connection conn = DBConnection.getConnection(profile);
+             PreparedStatement select = conn.prepareStatement(sql)) {
+            select.setString(1, apodo.trim());
+            try (ResultSet rs = select.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+
+                String fraseGuardada = rs.getString("frase_recuperacion");
+                if (fraseGuardada == null || !fraseGuardada.equalsIgnoreCase(fraseRecuperacion.trim())) {
+                    return false;
+                }
+
+                long guardiaId = rs.getLong("guardia_id");
+                try (PreparedStatement update = conn.prepareStatement("UPDATE guardias SET clave_acceso = ? WHERE id = ?")) {
+                    update.setString(1, nuevaClave.trim());
+                    update.setLong(2, guardiaId);
+                    return update.executeUpdate() > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al cambiar la clave: " + e.getMessage(), e);
+        }
     }
 
     @Override

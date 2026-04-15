@@ -17,6 +17,10 @@ public interface RenaceGestRepository {
 
     Guardia crearGuardia(String nombreReal, String apodo, String rango, String claveAcceso, boolean maestreActivo, Long solicitanteId);
 
+    void guardarDatosRecuperacionGuardia(Long guardiaId, String correoRecuperacion, String fraseRecuperacion);
+
+    boolean cambiarClaveConFrase(String apodo, String fraseRecuperacion, String nuevaClave);
+
     Guardia actualizarGuardia(Long guardiaId, String nombreReal, String apodo, String rango, String claveAcceso, int puntosGracia, String estadoHonor, boolean maestreActivo, Long solicitanteId);
 
     boolean eliminarGuardia(Long guardiaId, Long solicitanteId);

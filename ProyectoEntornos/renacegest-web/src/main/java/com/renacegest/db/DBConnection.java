@@ -94,4 +94,21 @@ public class DBConnection {
 
         return null;
     }
+
+    public static void ensureRecoverySupport(String profile) {
+        String normalizedProfile = PROFILE_PRUEBA.equalsIgnoreCase(profile) ? PROFILE_PRUEBA : PROFILE_REAL;
+        String sql = "CREATE TABLE IF NOT EXISTS guardias_recuperacion ("
+                + "guardia_id BIGINT PRIMARY KEY, "
+                + "correo_recuperacion VARCHAR(255), "
+                + "frase_recuperacion VARCHAR(255) NOT NULL, "
+                + "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
+                + "FOREIGN KEY (guardia_id) REFERENCES guardias(id) ON DELETE CASCADE)";
+
+        try (Connection conn = getConnection(normalizedProfile);
+             java.sql.Statement statement = conn.createStatement()) {
+            statement.execute(sql);
+        } catch (SQLException e) {
+            System.err.println("Error al asegurar soporte de recuperacion: " + e.getMessage());
+        }
+    }
 }

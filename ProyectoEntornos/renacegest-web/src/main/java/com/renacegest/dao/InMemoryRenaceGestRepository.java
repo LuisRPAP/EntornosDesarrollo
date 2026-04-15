@@ -38,6 +38,7 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
     private final AtomicLong valoracionSequence = new AtomicLong(1);
 
     private final Map<Long, Guardia> guardias = new LinkedHashMap<>();
+    private final Map<Long, RecoveryData> recuperacionesGuardia = new LinkedHashMap<>();
     private final Map<Long, GrupoMision> grupos = new LinkedHashMap<>();
     private final Map<Long, SeccionMaestranza> secciones = new LinkedHashMap<>();
     private final Map<Long, Pertrecho> pertrechos = new LinkedHashMap<>();
@@ -115,6 +116,16 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
         guardias.put(guardia.getId(), guardia);
     }
 
+    private static final class RecoveryData {
+        private final String correoRecuperacion;
+        private final String fraseRecuperacion;
+
+        private RecoveryData(String correoRecuperacion, String fraseRecuperacion) {
+            this.correoRecuperacion = correoRecuperacion;
+            this.fraseRecuperacion = fraseRecuperacion.trim();
+        }
+    }
+
     @Override
     public synchronized List<Guardia> findAllGuardias() {
         return new ArrayList<>(guardias.values());
@@ -151,6 +162,45 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
         );
         guardias.put(guardia.getId(), guardia);
         return guardia;
+    }
+
+    @Override
+    public synchronized void guardarDatosRecuperacionGuardia(Long guardiaId, String correoRecuperacion, String fraseRecuperacion) {
+        if (guardiaId == null) {
+            throw new IllegalArgumentException("El guardia es obligatorio.");
+        }
+        if (fraseRecuperacion == null || fraseRecuperacion.isBlank()) {
+            throw new IllegalArgumentException("La frase de recuperacion es obligatoria.");
+        }
+
+        recuperacionesGuardia.put(guardiaId, new RecoveryData(correoRecuperacion, fraseRecuperacion));
+    }
+
+    @Override
+    public synchronized boolean cambiarClaveConFrase(String apodo, String fraseRecuperacion, String nuevaClave) {
+        if (apodo == null || apodo.isBlank() || fraseRecuperacion == null || fraseRecuperacion.isBlank() || nuevaClave == null || nuevaClave.isBlank()) {
+            throw new IllegalArgumentException("Faltan datos para cambiar la clave.");
+        }
+        if (nuevaClave.trim().length() < 4) {
+            throw new IllegalArgumentException("La nueva clave debe tener al menos 4 caracteres.");
+        }
+
+        Guardia guardia = guardias.values().stream()
+                .filter(item -> item.getApodo() != null && item.getApodo().equalsIgnoreCase(apodo.trim()))
+                .findFirst()
+                .orElse(null);
+
+        if (guardia == null) {
+            return false;
+        }
+
+        RecoveryData recoveryData = recuperacionesGuardia.get(guardia.getId());
+        if (recoveryData == null || !recoveryData.fraseRecuperacion.equalsIgnoreCase(fraseRecuperacion.trim())) {
+            return false;
+        }
+
+        guardia.setClaveAcceso(nuevaClave.trim());
+        return true;
     }
 
     @Override

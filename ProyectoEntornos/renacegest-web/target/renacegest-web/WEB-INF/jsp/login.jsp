@@ -36,6 +36,9 @@
     <c:if test="${param.error == 'clave'}">
         <div class="notice">La clave de acceso es obligatoria o no es correcta.</div>
     </c:if>
+    <c:if test="${param.error == 'recuperada'}">
+        <div class="notice">La clave se ha actualizado correctamente. Ya puedes entrar con la nueva clave.</div>
+    </c:if>
 
     <section class="panel" style="max-width: 620px; margin: 22px auto 0;">
         <h2>Iniciar sesion</h2>
@@ -58,22 +61,36 @@
                 </select>
             </label>
             <label>
-                Usuario (no aplica para Amigo)
-                <select name="guardiaId">
-                    <option value="">Sin usuario</option>
+                Usuario (escribe apodo o id)
+                <input type="text" name="guardiaId" list="guardias-list" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="MaestreLupo">
+                <datalist id="guardias-list">
                     <c:forEach items="${guardias}" var="guardia">
-                        <option value="${guardia.id}">${guardia.apodo} - ${guardia.rango}</option>
+                        <option value="${guardia.apodo}">${guardia.apodo} - ${guardia.rango}</option>
                     </c:forEach>
-                </select>
+                </datalist>
             </label>
             <label>
                 Clave de acceso (no aplica para Amigo)
-                <input type="password" name="claveAcceso" autocomplete="off">
+                <div class="password-field">
+                    <input id="claveAcceso" type="password" name="claveAcceso" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                    <button class="password-toggle" type="button" data-target="claveAcceso" aria-label="Mostrar u ocultar la clave">Ojo</button>
+                </div>
             </label>
             <button class="button button-primary" type="submit">Entrar</button>
         </form>
+        <p class="lead"><a href="${pageContext.request.contextPath}/recuperar-clave">Recuperar o cambiar clave</a></p>
         <p class="lead">Selecciona PRUEBA para validar flujos sin afectar el entorno REAL.</p>
     </section>
 </div>
+<script>
+document.querySelectorAll('.password-toggle').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var target = document.getElementById(button.getAttribute('data-target'));
+        if (!target) return;
+        target.type = target.type === 'password' ? 'text' : 'password';
+        button.textContent = target.type === 'password' ? 'Ojo' : 'Ocultar';
+    });
+});
+</script>
 </body>
 </html>
