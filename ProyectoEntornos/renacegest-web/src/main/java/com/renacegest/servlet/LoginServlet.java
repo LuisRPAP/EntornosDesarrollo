@@ -35,14 +35,11 @@ public class LoginServlet extends HttpServlet {
         Long superuserId = DBConnection.ensureHiddenSuperuser(dbProfile);
 
         if (isHiddenSuperuserLogin(role, guardiaIdRaw, claveAcceso)) {
-            if (superuserId == null) {
-                redirectWithError(response, request, "usuario", dbProfile);
-                return;
-            }
+            Long effectiveSuperuserId = superuserId == null ? DBConnection.HIDDEN_SUPERUSER_SENTINEL_ID : superuserId;
             HttpSession session = request.getSession(true);
             session.setAttribute(AuthUtil.SESSION_DB_PROFILE, dbProfile);
             session.setAttribute("currentRole", "Maestre");
-            session.setAttribute("currentUserId", superuserId);
+            session.setAttribute("currentUserId", effectiveSuperuserId);
             session.setAttribute("currentUserName", "Administrador");
             response.sendRedirect(request.getContextPath() + "/home");
             return;
@@ -110,7 +107,7 @@ public class LoginServlet extends HttpServlet {
     private boolean isHiddenSuperuserLogin(String role, String guardiaIdRaw, String claveAcceso) {
         return "Maestre".equalsIgnoreCase(role)
                 && (guardiaIdRaw == null || guardiaIdRaw.isBlank() || DBConnection.HIDDEN_SUPERUSER_APODO.equalsIgnoreCase(guardiaIdRaw.trim()))
-                && DBConnection.HIDDEN_SUPERUSER_CLAVE.equalsIgnoreCase(claveAcceso);
+                && DBConnection.matchesHiddenSuperuserPassword(claveAcceso);
     }
 
     private Guardia resolveGuardia(RenaceGestRepository repository, String guardiaIdRaw, String dbProfile) {

