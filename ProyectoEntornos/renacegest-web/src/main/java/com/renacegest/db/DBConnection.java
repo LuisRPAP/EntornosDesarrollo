@@ -31,8 +31,8 @@ public class DBConnection {
     private static final long DB_IDLE_TIMEOUT_MS = 120000L;
     private static final long DB_MAX_LIFETIME_MS = 600000L;
     private static final ThreadLocal<String> CURRENT_PROFILE = ThreadLocal.withInitial(() -> PROFILE_PRUEBA);
-    private static final HikariDataSource DATASOURCE_REAL = buildDataSource(DB_NAME_REAL, PROFILE_REAL);
-    private static final HikariDataSource DATASOURCE_PRUEBA = buildDataSource(DB_NAME_PRUEBA, PROFILE_PRUEBA);
+    private static HikariDataSource DATASOURCE_REAL;
+    private static HikariDataSource DATASOURCE_PRUEBA;
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(DBConnection::closeDataSources, "renacegest-db-pool-shutdown"));
@@ -70,17 +70,35 @@ public class DBConnection {
 
     private static void closeDataSources() {
         try {
-            DATASOURCE_REAL.close();
+            if (DATASOURCE_REAL != null) {
+                DATASOURCE_REAL.close();
+            }
         } catch (Exception ignored) {
         }
         try {
-            DATASOURCE_PRUEBA.close();
+            if (DATASOURCE_PRUEBA != null) {
+                DATASOURCE_PRUEBA.close();
+            }
         } catch (Exception ignored) {
         }
     }
 
+    private static synchronized HikariDataSource getOrCreateDataSource(String profile) {
+        if (PROFILE_PRUEBA.equalsIgnoreCase(profile)) {
+            if (DATASOURCE_PRUEBA == null) {
+                DATASOURCE_PRUEBA = buildDataSource(DB_NAME_PRUEBA, PROFILE_PRUEBA);
+            }
+            return DATASOURCE_PRUEBA;
+        } else {
+            if (DATASOURCE_REAL == null) {
+                DATASOURCE_REAL = buildDataSource(DB_NAME_REAL, PROFILE_REAL);
+            }
+            return DATASOURCE_REAL;
+        }
+    }
+
     public static Connection getConnection(String profile) throws SQLException {
-        HikariDataSource dataSource = PROFILE_PRUEBA.equalsIgnoreCase(profile) ? DATASOURCE_PRUEBA : DATASOURCE_REAL;
+        HikariDataSource dataSource = getOrCreateDataSource(profile);
         return dataSource.getConnection();
     }
 
