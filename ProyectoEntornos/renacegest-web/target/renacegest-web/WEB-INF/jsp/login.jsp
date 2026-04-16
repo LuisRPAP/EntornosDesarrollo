@@ -39,6 +39,12 @@
     <c:if test="${param.error == 'recuperada'}">
         <div class="notice">La clave se ha actualizado correctamente. Ya puedes entrar con la nueva clave.</div>
     </c:if>
+    <c:if test="${param.error == 'db'}">
+        <div class="notice">No se pudo conectar con la base de datos. Revisa credenciales y permisos MySQL.</div>
+    </c:if>
+    <c:if test="${not empty dbErrorMessage}">
+        <div class="notice">${dbErrorMessage}</div>
+    </c:if>
 
     <section class="panel" style="max-width: 620px; margin: 22px auto 0;">
         <h2>Iniciar sesion</h2>

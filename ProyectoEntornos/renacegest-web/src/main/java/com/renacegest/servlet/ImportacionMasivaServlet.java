@@ -37,6 +37,7 @@ public class ImportacionMasivaServlet extends HttpServlet {
         if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento")) {
             return;
         }
+        applyResetMessageIfPresent(request);
         request.setAttribute("selectedType", TYPE_GUARDIAS);
         request.setAttribute("selectedDelimiter", "auto");
         forward(request, response);
@@ -73,8 +74,16 @@ public class ImportacionMasivaServlet extends HttpServlet {
             return;
         }
 
+        char delimiter = resolveDelimiter(rawLines, delimiterMode);
+        String detectedType = detectTypeFromHeader(rawLines, delimiter);
+        if (detectedType != null && !detectedType.equals(targetType)) {
+            request.setAttribute("estado", "El CSV parece ser de tipo '" + detectedType + "'. Selecciona ese tipo e intenta de nuevo.");
+            forward(request, response);
+            return;
+        }
+
         RenaceGestRepository repository = SessionRepositoryResolver.resolve(request);
-        ImportSummary summary = importByType(repository, targetType, delimiterMode, rawLines, currentUserId);
+        ImportSummary summary = importByType(repository, targetType, rawLines, currentUserId, delimiter);
 
         request.setAttribute("estado", String.format(
                 "Importacion finalizada: %d insertadas, %d omitidas, %d con error.",
@@ -88,8 +97,7 @@ public class ImportacionMasivaServlet extends HttpServlet {
         forward(request, response);
     }
 
-    private ImportSummary importByType(RenaceGestRepository repository, String targetType, String delimiterMode, List<String> rawLines, Long currentUserId) {
-        char delimiter = resolveDelimiter(rawLines, delimiterMode);
+    private ImportSummary importByType(RenaceGestRepository repository, String targetType, List<String> rawLines, Long currentUserId, char delimiter) {
         List<List<String>> rows = parseRows(rawLines, delimiter);
         rows = stripHeaderIfPresent(rows, targetType);
 
@@ -118,7 +126,7 @@ public class ImportacionMasivaServlet extends HttpServlet {
                 }
                 summary.inserted++;
             } catch (Exception ex) {
-                summary.errors.add("Linea " + logicalLine + ": " + ex.getMessage());
+                summary.errors.add("Linea " + logicalLine + ": " + humanizeImportError(ex));
             }
         }
 
@@ -306,6 +314,68 @@ public class ImportacionMasivaServlet extends HttpServlet {
         return rows;
     }
 
+    private String detectTypeFromHeader(List<String> lines, char delimiter) {
+        if (lines == null || lines.isEmpty()) {
+            return null;
+        }
+
+        List<String> cols = parseCsvLine(lines.get(0), delimiter);
+        if (cols.isEmpty()) {
+            return null;
+        }
+
+        String first = normalizeHeaderToken(cols.get(0));
+        if ("nombrereal".equals(first) || "nombre_real".equals(first)) {
+            return TYPE_GUARDIAS;
+        }
+        if ("nombreseccion".equals(first)) {
+            return TYPE_SECCIONES;
+        }
+        if ("seccionnombre".equals(first)) {
+            return TYPE_PERTRECHOS;
+        }
+        if ("nombregrupo".equals(first)) {
+            return TYPE_GRUPOS;
+        }
+        if ("emisorapodo".equals(first)) {
+            return TYPE_MENSAJES;
+        }
+
+        return null;
+    }
+
+    private String normalizeHeaderToken(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.trim().toLowerCase().replace(" ", "");
+    }
+
+    private String humanizeImportError(Exception ex) {
+        Throwable root = ex;
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+
+        String message = root.getMessage();
+        if (message == null || message.isBlank()) {
+            message = ex.getMessage();
+        }
+        if (message == null || message.isBlank()) {
+            return "Error desconocido durante la importacion.";
+        }
+
+        String lower = message.toLowerCase();
+        if (lower.contains("duplicate entry")) {
+            return "Registro duplicado: ese valor ya existe en la base de datos.";
+        }
+        if (lower.contains("solo el maestre puede enviar mensajes globales")) {
+            return "Broadcast no permitido: solo el Maestre puede enviar mensajes globales.";
+        }
+
+        return message;
+    }
+
     private char resolveDelimiter(List<String> lines, String mode) {
         if ("semicolon".equals(mode)) {
             return ';';
@@ -396,6 +466,17 @@ public class ImportacionMasivaServlet extends HttpServlet {
     private void forward(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/importacion.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private void applyResetMessageIfPresent(HttpServletRequest request) {
+        String reset = request.getParameter("reset");
+        if ("ok".equalsIgnoreCase(reset)) {
+            request.setAttribute("estado", "Base PRUEBA reiniciada correctamente. Ya puedes importar desde cero.");
+        } else if ("forbidden".equalsIgnoreCase(reset)) {
+            request.setAttribute("estado", "Reset bloqueado: esta accion solo se permite en el perfil PRUEBA.");
+        } else if ("error".equalsIgnoreCase(reset)) {
+            request.setAttribute("estado", "No se pudo completar el reset de PRUEBA. Revisa la conexion y los permisos MySQL.");
+        }
     }
 
     private static final class ImportSummary {

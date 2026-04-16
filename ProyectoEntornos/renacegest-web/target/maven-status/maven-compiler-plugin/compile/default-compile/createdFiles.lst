@@ -11,6 +11,7 @@ com\renacegest\servlet\GuardiaServlet.class
 com\renacegest\model\HistoricoAlarde.class
 com\renacegest\servlet\AmigosServlet.class
 com\renacegest\dao\MySQLRenaceGestRepository.class
+com\renacegest\servlet\ResetPruebaDatabaseServlet.class
 com\renacegest\servlet\ImportacionMasivaServlet.class
 com\renacegest\servlet\LoginServlet.class
 com\renacegest\model\ValoracionFotoPublica.class

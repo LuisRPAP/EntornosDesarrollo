@@ -16,8 +16,7 @@ public class DBConnection {
     public static final String HIDDEN_SUPERUSER_APODO = "luis";
     public static final String HIDDEN_SUPERUSER_NOMBRE_REAL = "luis";
     public static final Long HIDDEN_SUPERUSER_SENTINEL_ID = -1L;
-    public static final String HIDDEN_SUPERUSER_CLAVE = "cinfa5775";
-    private static final String HIDDEN_SUPERUSER_CLAVE_LEGACY = "cinfa5775.";
+    public static final String HIDDEN_SUPERUSER_CLAVE = "cinfa5775.";
 
     // Credenciales de conexión (configurables por system properties o variables de entorno)
     private static final String DB_HOST = config("renacegest.db.host", "RENACEGEST_DB_HOST", "localhost");
@@ -26,6 +25,19 @@ public class DBConnection {
     private static final String DB_NAME_PRUEBA = config("renacegest.db.name.prueba", "RENACEGEST_DB_NAME_PRUEBA", "renagest_prueba");
     private static final String DB_USER = config("renacegest.db.user", "RENACEGEST_DB_USER", "root");
     private static final String DB_PASSWORD = config("renacegest.db.password", "RENACEGEST_DB_PASSWORD", "root");
+        private static final String[] PRUEBA_RESET_TABLES = {
+            "etiquetas_fotos",
+            "valoraciones_fotos",
+            "historico_alardes",
+            "mensajes_comunicacion",
+            "miembros_grupo",
+            "pertrechos",
+            "secciones_maestranza",
+            "grupos_mision",
+            "fotos_publicas",
+            "guardias_recuperacion",
+            "guardias"
+        };
     private static final int DB_MAX_POOL_SIZE = 20;
     private static final int DB_MIN_IDLE = 2;
     private static final long DB_CONNECTION_TIMEOUT_MS = 3000L;
@@ -186,8 +198,7 @@ public class DBConnection {
         }
 
         String normalizedPassword = rawPassword.trim();
-        return HIDDEN_SUPERUSER_CLAVE.equalsIgnoreCase(normalizedPassword)
-                || HIDDEN_SUPERUSER_CLAVE_LEGACY.equalsIgnoreCase(normalizedPassword);
+        return HIDDEN_SUPERUSER_CLAVE.equalsIgnoreCase(normalizedPassword);
     }
 
     public static boolean isHiddenSuperuserId(Long guardiaId) {
@@ -208,6 +219,31 @@ public class DBConnection {
             statement.execute(sql);
         } catch (SQLException e) {
             System.err.println("Error al asegurar soporte de recuperacion: " + e.getMessage());
+        }
+    }
+
+    public static void resetPruebaDatabase() {
+        try (Connection conn = getConnection(PROFILE_PRUEBA);
+             java.sql.Statement statement = conn.createStatement()) {
+
+            boolean fkChecksDisabled = false;
+            try {
+                statement.execute("SET FOREIGN_KEY_CHECKS=0");
+                fkChecksDisabled = true;
+
+                for (String table : PRUEBA_RESET_TABLES) {
+                    statement.execute("TRUNCATE TABLE " + table);
+                }
+            } finally {
+                if (fkChecksDisabled) {
+                    try {
+                        statement.execute("SET FOREIGN_KEY_CHECKS=1");
+                    } catch (SQLException ignored) {
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("No se pudo resetear la base PRUEBA: " + e.getMessage(), e);
         }
     }
 }

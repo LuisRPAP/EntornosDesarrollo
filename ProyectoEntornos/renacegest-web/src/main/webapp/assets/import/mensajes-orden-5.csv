@@ -8,7 +8,7 @@ GuardiaInes;Grupo 06;Mensaje operativo 06;false
 GuardiaPedro;Grupo 07;Mensaje operativo 07;false
 GuardiaLucia;Grupo 08;Mensaje operativo 08;false
 GuardiaJavier;Grupo 09;Mensaje operativo 09;false
-GuardiaMarta;;Aviso general de prueba 10;true
+GuardiaMarta;;Aviso general de prueba 10;false
 GuardiaRaul;Grupo 11;Mensaje operativo 11;false
 GuardiaNora;Grupo 12;Mensaje operativo 12;false
 GuardiaDiego;Grupo 13;Mensaje operativo 13;false
@@ -18,7 +18,7 @@ GuardiaCarla;Grupo 16;Mensaje operativo 16;false
 GuardiaHugo;Grupo 17;Mensaje operativo 17;false
 GuardiaRosa;Grupo 18;Mensaje operativo 18;false
 GuardiaMateo;Grupo 19;Mensaje operativo 19;false
-SargentoPaula;;Aviso general de prueba 20;true
+SargentoPaula;;Aviso general de prueba 20;false
 GuardiaJoel;Grupo 21;Mensaje operativo 21;false
 GuardiaAlma;Grupo 22;Mensaje operativo 22;false
 GuardiaHector;Grupo 23;Mensaje operativo 23;false
@@ -28,7 +28,7 @@ GuardiaIrene;Grupo 26;Mensaje operativo 26;false
 GuardiaMarco;Grupo 27;Mensaje operativo 27;false
 GuardiaTeresa;Grupo 28;Mensaje operativo 28;false
 GuardiaAdrian;Grupo 29;Mensaje operativo 29;false
-SargentoSilvia;;Aviso general de prueba 30;true
+SargentoSilvia;;Aviso general de prueba 30;false
 GuardiaToni;Grupo 31;Mensaje operativo 31;false
 GuardiaClara;Grupo 32;Mensaje operativo 32;false
 GuardiaSergio;Grupo 33;Mensaje operativo 33;false
@@ -38,7 +38,7 @@ GuardiaNoa;Grupo 36;Mensaje operativo 36;false
 GuardiaKevin;Grupo 37;Mensaje operativo 37;false
 GuardiaMarta2;Grupo 38;Mensaje operativo 38;false
 GuardiaAndres;Grupo 39;Mensaje operativo 39;false
-SargentoVeronica;;Aviso general de prueba 40;true
+SargentoVeronica;;Aviso general de prueba 40;false
 GuardiaRuben;Grupo 41;Mensaje operativo 41;false
 GuardiaElsa;Grupo 42;Mensaje operativo 42;false
 GuardiaPablo;Grupo 43;Mensaje operativo 43;false
@@ -48,4 +48,4 @@ GuardiaElena2;Grupo 46;Mensaje operativo 46;false
 GuardiaSamuel;Grupo 47;Mensaje operativo 47;false
 GuardiaLucia2;Grupo 48;Mensaje operativo 48;false
 GuardiaDaniel;Grupo 49;Mensaje operativo 49;false
-SargentoAlicia;;Aviso general de prueba 50;true
+SargentoAlicia;;Aviso general de prueba 50;false

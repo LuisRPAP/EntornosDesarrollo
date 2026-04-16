@@ -56,6 +56,16 @@
         </form>
     </section>
 
+    <c:if test="${sessionScope.currentDbProfile == 'PRUEBA' && sessionScope.currentRole == 'Maestre'}">
+        <section class="panel">
+            <h2>Reset de base PRUEBA</h2>
+            <p class="lead text-danger">Borra todos los datos de PRUEBA y te permite empezar de cero. No afecta a la base REAL.</p>
+            <form method="post" action="${pageContext.request.contextPath}/reset-prueba-db" onsubmit="return confirm('Se borraran todos los datos de PRUEBA. ¿Continuar?');">
+                <button class="button button-secondary" type="submit">Resetear base PRUEBA</button>
+            </form>
+        </section>
+    </c:if>
+
     <c:if test="${not empty importErrors}">
         <section class="panel">
             <h2>Errores detectados</h2>
