@@ -10,6 +10,10 @@
 </head>
 <body>
 <div class="app-shell">
+    <c:if test="${not empty dbErrorMessage}">
+        <div class="notice">${dbErrorMessage}</div>
+    </c:if>
+
     <header class="hero">
         <div>
             <p class="eyebrow">Guardias de Santiago</p>

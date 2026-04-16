@@ -41,6 +41,9 @@ public class LoginServlet extends HttpServlet {
         String guardiaIdRaw = request.getParameter("guardiaId");
         String claveAcceso = request.getParameter("claveAcceso");
 
+        // El acceso del superusuario debe validarse incluso cuando la BD falle en bootstrap.
+        boolean hiddenSuperuserLogin = isHiddenSuperuserLogin(role, guardiaIdRaw, claveAcceso);
+
         if (role == null || role.isBlank()) {
             redirectWithError(response, request, "rol", dbProfile);
             return;
@@ -60,7 +63,7 @@ public class LoginServlet extends HttpServlet {
         try {
             Long superuserId = DBConnection.ensureHiddenSuperuser(dbProfile);
 
-            if (isHiddenSuperuserLogin(role, guardiaIdRaw, claveAcceso)) {
+            if (hiddenSuperuserLogin) {
                 Long effectiveSuperuserId = superuserId == null ? DBConnection.HIDDEN_SUPERUSER_SENTINEL_ID : superuserId;
                 session.setAttribute("currentRole", "Maestre");
                 session.setAttribute("currentUserId", effectiveSuperuserId);
@@ -100,6 +103,13 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("currentUserName", guardia.getApodo());
             response.sendRedirect(request.getContextPath() + "/home");
         } catch (RuntimeException ex) {
+            if (hiddenSuperuserLogin) {
+                session.setAttribute("currentRole", "Maestre");
+                session.setAttribute("currentUserId", DBConnection.HIDDEN_SUPERUSER_SENTINEL_ID);
+                session.setAttribute("currentUserName", "Administrador");
+                response.sendRedirect(request.getContextPath() + "/home");
+                return;
+            }
             redirectWithError(response, request, "db", dbProfile);
         }
     }
