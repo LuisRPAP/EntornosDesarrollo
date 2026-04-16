@@ -6,6 +6,9 @@
 *.xlsx
 *.doc
 *.json
+*.png
+*.otf
+*.zip
 .Diagramas/
 .Git/
 .JUnit/
