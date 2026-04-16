@@ -9,6 +9,8 @@
 *.png
 *.otf
 *.zip
+*.pptx
+*.ttf
 .Diagramas/
 .Git/
 .JUnit/
