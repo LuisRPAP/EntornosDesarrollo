@@ -1,7 +1,9 @@
 package com.renacegest.db;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
@@ -23,24 +25,63 @@ public class DBConnection {
     private static final String DB_NAME_PRUEBA = "renagest_prueba";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "root";
+    private static final int DB_MAX_POOL_SIZE = 20;
+    private static final int DB_MIN_IDLE = 2;
+    private static final long DB_CONNECTION_TIMEOUT_MS = 3000L;
+    private static final long DB_IDLE_TIMEOUT_MS = 120000L;
+    private static final long DB_MAX_LIFETIME_MS = 600000L;
     private static final ThreadLocal<String> CURRENT_PROFILE = ThreadLocal.withInitial(() -> PROFILE_PRUEBA);
+    private static final HikariDataSource DATASOURCE_REAL = buildDataSource(DB_NAME_REAL, PROFILE_REAL);
+    private static final HikariDataSource DATASOURCE_PRUEBA = buildDataSource(DB_NAME_PRUEBA, PROFILE_PRUEBA);
 
     static {
+        Runtime.getRuntime().addShutdownHook(new Thread(DBConnection::closeDataSources, "renacegest-db-pool-shutdown"));
+    }
+
+    private static HikariDataSource buildDataSource(String dbName, String profileName) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(buildJdbcUrl(dbName));
+        config.setUsername(DB_USER);
+        config.setPassword(DB_PASSWORD);
+        config.setPoolName("renacegest-" + profileName.toLowerCase() + "-pool");
+        config.setMaximumPoolSize(DB_MAX_POOL_SIZE);
+        config.setMinimumIdle(DB_MIN_IDLE);
+        config.setConnectionTimeout(DB_CONNECTION_TIMEOUT_MS);
+        config.setIdleTimeout(DB_IDLE_TIMEOUT_MS);
+        config.setMaxLifetime(DB_MAX_LIFETIME_MS);
+        config.setAutoCommit(true);
+
+        // Optimiza statements frecuentes y reduce round-trips en MySQL.
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.addDataSourceProperty("useServerPrepStmts", "true");
+        config.addDataSourceProperty("rewriteBatchedStatements", "true");
+
+        return new HikariDataSource(config);
+    }
+
+    private static String buildJdbcUrl(String dbName) {
+        return String.format(
+                "jdbc:mysql://%s:%s/%s?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8",
+                DB_HOST, DB_PORT, dbName
+        );
+    }
+
+    private static void closeDataSources() {
         try {
-            // Cargar driver de MySQL
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Error al cargar driver MySQL: " + e.getMessage());
+            DATASOURCE_REAL.close();
+        } catch (Exception ignored) {
+        }
+        try {
+            DATASOURCE_PRUEBA.close();
+        } catch (Exception ignored) {
         }
     }
 
     public static Connection getConnection(String profile) throws SQLException {
-        String dbName = PROFILE_PRUEBA.equalsIgnoreCase(profile) ? DB_NAME_PRUEBA : DB_NAME_REAL;
-        String url = String.format(
-                "jdbc:mysql://%s:%s/%s?serverTimezone=UTC&autoReconnect=true",
-                DB_HOST, DB_PORT, dbName
-        );
-        return DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
+        HikariDataSource dataSource = PROFILE_PRUEBA.equalsIgnoreCase(profile) ? DATASOURCE_PRUEBA : DATASOURCE_REAL;
+        return dataSource.getConnection();
     }
 
     public static Connection getConnection() throws SQLException {

@@ -49,7 +49,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     // ==================== GUARDIAS ====================
 
     @Override
-    public synchronized List<Guardia> findAllGuardias() {
+    public List<Guardia> findAllGuardias() {
         String sql = "SELECT id, nombre_real, apodo, rango, clave_acceso, puntos_gracia, estado_honor, maestre_activo FROM guardias ORDER BY id";
         List<Guardia> guardias = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Guardia findGuardiaById(Long guardiaId) {
+    public Guardia findGuardiaById(Long guardiaId) {
         if (DBConnection.isHiddenSuperuserId(guardiaId)) {
             return new Guardia(
                     guardiaId,
@@ -122,7 +122,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Guardia crearGuardia(String nombreReal, String apodo, String rango, String claveAcceso, boolean maestreActivo, Long solicitanteId) {
+    public Guardia crearGuardia(String nombreReal, String apodo, String rango, String claveAcceso, boolean maestreActivo, Long solicitanteId) {
         if (!esMaestre(solicitanteId)) {
             throw new IllegalArgumentException("Solo el Maestre puede crear guardias.");
         }
@@ -162,7 +162,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized void guardarDatosRecuperacionGuardia(Long guardiaId, String correoRecuperacion, String fraseRecuperacion) {
+    public void guardarDatosRecuperacionGuardia(Long guardiaId, String correoRecuperacion, String fraseRecuperacion) {
         if (guardiaId == null) {
             throw new IllegalArgumentException("El guardia es obligatorio.");
         }
@@ -185,7 +185,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean cambiarClaveConFrase(String apodo, String fraseRecuperacion, String nuevaClave) {
+    public boolean cambiarClaveConFrase(String apodo, String fraseRecuperacion, String nuevaClave) {
         if (apodo == null || apodo.isBlank() || fraseRecuperacion == null || fraseRecuperacion.isBlank() || nuevaClave == null || nuevaClave.isBlank()) {
             throw new IllegalArgumentException("Faltan datos para cambiar la clave.");
         }
@@ -223,7 +223,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Guardia actualizarGuardia(Long guardiaId, String nombreReal, String apodo, String rango, String claveAcceso, int puntosGracia, String estadoHonor, boolean maestreActivo, Long solicitanteId) {
+    public Guardia actualizarGuardia(Long guardiaId, String nombreReal, String apodo, String rango, String claveAcceso, int puntosGracia, String estadoHonor, boolean maestreActivo, Long solicitanteId) {
         if (!esMaestre(solicitanteId)) {
             throw new IllegalArgumentException("Solo el Maestre puede editar guardias.");
         }
@@ -267,7 +267,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean eliminarGuardia(Long guardiaId, Long solicitanteId) {
+    public boolean eliminarGuardia(Long guardiaId, Long solicitanteId) {
         if (!esMaestre(solicitanteId)) {
             throw new IllegalArgumentException("Solo el Maestre puede eliminar guardias.");
         }
@@ -309,7 +309,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     // ==================== GRUPOS Y MIEMBROS ====================
 
     @Override
-    public synchronized List<GrupoMision> findAllGrupos() {
+    public List<GrupoMision> findAllGrupos() {
         String sql = "SELECT id, nombre_grupo, descripcion, tipo, jefe_equipo, creado_por, activo FROM grupos_mision ORDER BY id";
         List<GrupoMision> grupos = new ArrayList<>();
 
@@ -337,7 +337,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized GrupoMision findGrupoById(Long grupoId) {
+    public GrupoMision findGrupoById(Long grupoId) {
         String sql = "SELECT id, nombre_grupo, descripcion, tipo, jefe_equipo, creado_por, activo FROM grupos_mision WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -365,7 +365,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized GrupoMision crearGrupo(String nombreGrupo, String descripcion, String tipo, Long jefeEquipoId, Long creadoPorId) {
+    public GrupoMision crearGrupo(String nombreGrupo, String descripcion, String tipo, Long jefeEquipoId, Long creadoPorId) {
         Guardia jefeEquipo = findGuardiaById(jefeEquipoId);
         Guardia creador = findGuardiaById(creadoPorId);
 
@@ -407,7 +407,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized List<MiembroGrupo> findMiembrosByGrupo(Long grupoId) {
+    public List<MiembroGrupo> findMiembrosByGrupo(Long grupoId) {
         String sql = "SELECT id, grupo_id, miembro_id, apodo, nombre_real, rol_en_grupo, puede_modificar_miembros, fecha_alta FROM miembros_grupo WHERE grupo_id = ? ORDER BY fecha_alta DESC";
         List<MiembroGrupo> miembros = new ArrayList<>();
 
@@ -438,7 +438,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean agregarMiembro(Long grupoId, Long miembroId, Long solicitanteId) {
+    public boolean agregarMiembro(Long grupoId, Long miembroId, Long solicitanteId) {
         if (!puedeModificarGrupo(grupoId, solicitanteId)) {
             return false;
         }
@@ -487,7 +487,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean quitarMiembro(Long grupoId, Long miembroId, Long solicitanteId) {
+    public boolean quitarMiembro(Long grupoId, Long miembroId, Long solicitanteId) {
         if (!puedeModificarGrupo(grupoId, solicitanteId)) {
             return false;
         }
@@ -510,7 +510,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     // ==================== MENSAJES ====================
 
     @Override
-    public synchronized List<MensajeComunicacion> findAllMensajes() {
+    public List<MensajeComunicacion> findAllMensajes() {
         String sql = "SELECT id, emisor_id, emisor_apodo, grupo_id, grupo_nombre, contenido, es_broadcast, visible, fecha_mensaje FROM mensajes_comunicacion ORDER BY fecha_mensaje DESC LIMIT 100";
         List<MensajeComunicacion> mensajes = new ArrayList<>();
 
@@ -540,7 +540,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized MensajeComunicacion enviarMensaje(Long emisorId, Long grupoId, String contenido, boolean broadcast) {
+    public MensajeComunicacion enviarMensaje(Long emisorId, Long grupoId, String contenido, boolean broadcast) {
         Guardia emisor = findGuardiaById(emisorId);
         if (emisor == null) {
             throw new IllegalArgumentException("Emisor invalido");
@@ -606,7 +606,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     // ==================== SECCIONES ====================
 
     @Override
-    public synchronized List<SeccionMaestranza> findAllSecciones() {
+    public List<SeccionMaestranza> findAllSecciones() {
         String sql = "SELECT id, nombre_seccion, responsable_id, responsable_apodo FROM secciones_maestranza ORDER BY nombre_seccion";
         List<SeccionMaestranza> secciones = new ArrayList<>();
 
@@ -631,7 +631,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized SeccionMaestranza crearSeccion(String nombreSeccion, Long responsableId, Long solicitanteId) {
+    public SeccionMaestranza crearSeccion(String nombreSeccion, Long responsableId, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden crear secciones.");
         }
@@ -672,7 +672,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     // ==================== PERTRECHOS ====================
 
     @Override
-    public synchronized List<Pertrecho> findAllPertrechos() {
+    public List<Pertrecho> findAllPertrechos() {
         String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible FROM pertrechos ORDER BY id";
         List<Pertrecho> pertrechos = new ArrayList<>();
 
@@ -701,7 +701,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Pertrecho findPertrechoById(Long pertrechoId) {
+    public Pertrecho findPertrechoById(Long pertrechoId) {
         String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible FROM pertrechos WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -730,7 +730,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Pertrecho findPertrechoByTokenQr(String tokenQr) {
+    public Pertrecho findPertrechoByTokenQr(String tokenQr) {
         if (tokenQr == null || tokenQr.isBlank()) {
             return null;
         }
@@ -763,7 +763,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
+    public Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden crear pertrechos.");
         }
@@ -804,7 +804,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
+    public Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden editar pertrechos.");
         }
@@ -840,7 +840,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean eliminarPertrecho(Long pertrechoId, Long solicitanteId) {
+    public boolean eliminarPertrecho(Long pertrechoId, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden eliminar pertrechos.");
         }
@@ -877,7 +877,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized ResultadoClasificacionIa altaPertrechoConIa(String descripcion, Long solicitanteId) {
+    public ResultadoClasificacionIa altaPertrechoConIa(String descripcion, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden dar de alta pertrechos.");
         }
@@ -900,7 +900,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean validarEstadoIaMasivo(List<Long> idsPertrechos, String estadoIa, Long revisorId) {
+    public boolean validarEstadoIaMasivo(List<Long> idsPertrechos, String estadoIa, Long revisorId) {
         if (!esMaestre(revisorId)) {
             throw new IllegalArgumentException("Solo el Maestre puede validar estados IA de forma masiva.");
         }
@@ -928,14 +928,14 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized List<Pertrecho> findPertrechosPublicos() {
+    public List<Pertrecho> findPertrechosPublicos() {
         return findAllPertrechos();
     }
 
     // ==================== ALARDES ====================
 
     @Override
-    public synchronized List<HistoricoAlarde> findAllAlardes() {
+    public List<HistoricoAlarde> findAllAlardes() {
         String sql = "SELECT id, guardia_id, guardia_apodo, pertrecho_id, pertrecho_descripcion, autorizador_id, autorizador_apodo, fecha_salida, fecha_entrada, observaciones, ticket_maestranza, delta_gracia, integridad_salida, integridad_entrada FROM historico_alardes ORDER BY fecha_salida DESC";
         List<HistoricoAlarde> alardes = new ArrayList<>();
 
@@ -970,7 +970,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized List<HistoricoAlarde> findAlardesByPertrecho(Long pertrechoId) {
+    public List<HistoricoAlarde> findAlardesByPertrecho(Long pertrechoId) {
         String sql = "SELECT id, guardia_id, guardia_apodo, pertrecho_id, pertrecho_descripcion, autorizador_id, autorizador_apodo, fecha_salida, fecha_entrada, observaciones, ticket_maestranza, delta_gracia, integridad_salida, integridad_entrada FROM historico_alardes WHERE pertrecho_id = ? ORDER BY fecha_salida DESC";
         List<HistoricoAlarde> alardes = new ArrayList<>();
 
@@ -1007,7 +1007,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized HistoricoAlarde prestarPertrecho(Long guardiaId, Long pertrechoId, Long autorizadorId, String observaciones) {
+    public HistoricoAlarde prestarPertrecho(Long guardiaId, Long pertrechoId, Long autorizadorId, String observaciones) {
         Guardia guardia = findGuardiaById(guardiaId);
         Guardia autorizador = findGuardiaById(autorizadorId);
         Pertrecho pertrecho = findPertrechoById(pertrechoId);
@@ -1065,7 +1065,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized HistoricoAlarde registrarDevolucion(Long alardeId, int integridadDevuelta, String observaciones) {
+    public HistoricoAlarde registrarDevolucion(Long alardeId, int integridadDevuelta, String observaciones) {
         HistoricoAlarde alarde = findAllAlardes().stream()
                 .filter(item -> alardeId.equals(item.getId()))
                 .findFirst()
@@ -1145,7 +1145,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized int getTotalTicketsMaestranza() {
+    public int getTotalTicketsMaestranza() {
         String sql = "SELECT COUNT(*) as count FROM historico_alardes WHERE ticket_maestranza = TRUE";
 
         try (Connection conn = DBConnection.getConnection();
@@ -1165,7 +1165,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     // ==================== GALERIA PUBLICA ====================
 
     @Override
-    public synchronized List<FotoPublica> findGaleriaPublica() {
+    public List<FotoPublica> findGaleriaPublica() {
         String sql = "SELECT id, titulo, descripcion, lugar_evento, fecha_evento, url_imagen FROM fotos_publicas ORDER BY id";
         List<FotoPublica> fotos = new ArrayList<>();
 
@@ -1199,7 +1199,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean etiquetarPersonaEnFoto(Long fotoId, String nombrePersona, String etiquetadoPor, String usuarioRed) {
+    public boolean etiquetarPersonaEnFoto(Long fotoId, String nombrePersona, String etiquetadoPor, String usuarioRed) {
         FotoPublica foto = findFotoById(fotoId);
         if (foto == null || nombrePersona == null || nombrePersona.isBlank()) {
             return false;
@@ -1243,7 +1243,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized boolean valorarFotoPublica(Long fotoId, int puntuacion, String comentario, String visitante, String usuarioRed) {
+    public boolean valorarFotoPublica(Long fotoId, int puntuacion, String comentario, String visitante, String usuarioRed) {
         FotoPublica foto = findFotoById(fotoId);
         if (foto == null || puntuacion < 1 || puntuacion > 5) {
             return false;
