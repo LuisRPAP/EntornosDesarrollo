@@ -37,7 +37,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             DBConnection.ensureRecoverySupport(profile);
             DBConnection.getConnection(profile).close();
             System.out.println("MySQLRenaceGestRepository inicializado para perfil: " + profile);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("Error en inicialización de DAO: " + e.getMessage());
         }
     }
