@@ -10,6 +10,7 @@ import java.sql.SQLException;
  * Gestor de conexiones a MySQL con soporte de perfiles de sesión.
  */
 public class DBConnection {
+    private static final String MYSQL_DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
     public static final String PROFILE_REAL = "REAL";
     public static final String PROFILE_PRUEBA = "PRUEBA";
     public static final String HIDDEN_SUPERUSER_APODO = "luis";
@@ -40,6 +41,7 @@ public class DBConnection {
 
     private static HikariDataSource buildDataSource(String dbName, String profileName) {
         HikariConfig config = new HikariConfig();
+        config.setDriverClassName(MYSQL_DRIVER_CLASS);
         config.setJdbcUrl(buildJdbcUrl(dbName));
         config.setUsername(DB_USER);
         config.setPassword(DB_PASSWORD);
