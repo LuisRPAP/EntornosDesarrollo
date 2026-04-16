@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Collections;
 
 @WebServlet(urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
@@ -19,9 +20,16 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String selectedDbProfile = AuthUtil.normalizeDbProfile(request.getParameter("dbProfile"));
         request.setAttribute("selectedDbProfile", selectedDbProfile);
-        DBConnection.ensureHiddenSuperuser(selectedDbProfile);
+
+        try {
+            DBConnection.ensureHiddenSuperuser(selectedDbProfile);
+            request.setAttribute("guardias", repository(selectedDbProfile).findAllGuardias());
+        } catch (RuntimeException ex) {
+            request.setAttribute("guardias", Collections.emptyList());
+            request.setAttribute("dbErrorMessage", "No se pudo conectar con MySQL. Revisa usuario, clave y permisos de la base de datos.");
+        }
+
         request.setAttribute("superuserApodo", DBConnection.HIDDEN_SUPERUSER_APODO);
-        request.setAttribute("guardias", repository(selectedDbProfile).findAllGuardias());
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/login.jsp");
         dispatcher.forward(request, response);
     }
@@ -32,18 +40,6 @@ public class LoginServlet extends HttpServlet {
         String dbProfile = AuthUtil.normalizeDbProfile(request.getParameter("dbProfile"));
         String guardiaIdRaw = request.getParameter("guardiaId");
         String claveAcceso = request.getParameter("claveAcceso");
-        Long superuserId = DBConnection.ensureHiddenSuperuser(dbProfile);
-
-        if (isHiddenSuperuserLogin(role, guardiaIdRaw, claveAcceso)) {
-            Long effectiveSuperuserId = superuserId == null ? DBConnection.HIDDEN_SUPERUSER_SENTINEL_ID : superuserId;
-            HttpSession session = request.getSession(true);
-            session.setAttribute(AuthUtil.SESSION_DB_PROFILE, dbProfile);
-            session.setAttribute("currentRole", "Maestre");
-            session.setAttribute("currentUserId", effectiveSuperuserId);
-            session.setAttribute("currentUserName", "Administrador");
-            response.sendRedirect(request.getContextPath() + "/home");
-            return;
-        }
 
         if (role == null || role.isBlank()) {
             redirectWithError(response, request, "rol", dbProfile);
@@ -61,36 +57,51 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (guardiaIdRaw == null || guardiaIdRaw.isBlank()) {
-            redirectWithError(response, request, "usuario", dbProfile);
-            return;
-        }
+        try {
+            Long superuserId = DBConnection.ensureHiddenSuperuser(dbProfile);
 
-        if (claveAcceso == null || claveAcceso.isBlank()) {
-            redirectWithError(response, request, "clave", dbProfile);
-            return;
-        }
+            if (isHiddenSuperuserLogin(role, guardiaIdRaw, claveAcceso)) {
+                Long effectiveSuperuserId = superuserId == null ? DBConnection.HIDDEN_SUPERUSER_SENTINEL_ID : superuserId;
+                session.setAttribute("currentRole", "Maestre");
+                session.setAttribute("currentUserId", effectiveSuperuserId);
+                session.setAttribute("currentUserName", "Administrador");
+                response.sendRedirect(request.getContextPath() + "/home");
+                return;
+            }
 
-        Guardia guardia = resolveGuardia(repository(dbProfile), guardiaIdRaw, dbProfile);
-        if (guardia == null) {
-            redirectWithError(response, request, "usuario", dbProfile);
-            return;
-        }
+            if (guardiaIdRaw == null || guardiaIdRaw.isBlank()) {
+                redirectWithError(response, request, "usuario", dbProfile);
+                return;
+            }
 
-        if (!role.equalsIgnoreCase(guardia.getRango())) {
-            redirectWithError(response, request, "rango", dbProfile);
-            return;
-        }
+            if (claveAcceso == null || claveAcceso.isBlank()) {
+                redirectWithError(response, request, "clave", dbProfile);
+                return;
+            }
 
-        if (!claveAcceso.equalsIgnoreCase(guardia.getClaveAcceso())) {
-            redirectWithError(response, request, "clave", dbProfile);
-            return;
-        }
+            Guardia guardia = resolveGuardia(repository(dbProfile), guardiaIdRaw, dbProfile);
+            if (guardia == null) {
+                redirectWithError(response, request, "usuario", dbProfile);
+                return;
+            }
 
-        session.setAttribute("currentRole", guardia.getRango());
-        session.setAttribute("currentUserId", guardia.getId());
-        session.setAttribute("currentUserName", guardia.getApodo());
-        response.sendRedirect(request.getContextPath() + "/home");
+            if (!role.equalsIgnoreCase(guardia.getRango())) {
+                redirectWithError(response, request, "rango", dbProfile);
+                return;
+            }
+
+            if (!claveAcceso.equalsIgnoreCase(guardia.getClaveAcceso())) {
+                redirectWithError(response, request, "clave", dbProfile);
+                return;
+            }
+
+            session.setAttribute("currentRole", guardia.getRango());
+            session.setAttribute("currentUserId", guardia.getId());
+            session.setAttribute("currentUserName", guardia.getApodo());
+            response.sendRedirect(request.getContextPath() + "/home");
+        } catch (RuntimeException ex) {
+            redirectWithError(response, request, "db", dbProfile);
+        }
     }
 
     private RenaceGestRepository repository(String dbProfile) {

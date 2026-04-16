@@ -19,13 +19,13 @@ public class DBConnection {
     public static final String HIDDEN_SUPERUSER_CLAVE = "cinfa5775";
     private static final String HIDDEN_SUPERUSER_CLAVE_LEGACY = "cinfa5775.";
 
-    // Credenciales de conexión (configurables)
-    private static final String DB_HOST = "localhost";
-    private static final String DB_PORT = "3306";
-    private static final String DB_NAME_REAL = "renagest";
-    private static final String DB_NAME_PRUEBA = "renagest_prueba";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "root";
+    // Credenciales de conexión (configurables por system properties o variables de entorno)
+    private static final String DB_HOST = config("renacegest.db.host", "RENACEGEST_DB_HOST", "localhost");
+    private static final String DB_PORT = config("renacegest.db.port", "RENACEGEST_DB_PORT", "3306");
+    private static final String DB_NAME_REAL = config("renacegest.db.name.real", "RENACEGEST_DB_NAME_REAL", "renagest");
+    private static final String DB_NAME_PRUEBA = config("renacegest.db.name.prueba", "RENACEGEST_DB_NAME_PRUEBA", "renagest_prueba");
+    private static final String DB_USER = config("renacegest.db.user", "RENACEGEST_DB_USER", "root");
+    private static final String DB_PASSWORD = config("renacegest.db.password", "RENACEGEST_DB_PASSWORD", "root");
     private static final int DB_MAX_POOL_SIZE = 20;
     private static final int DB_MIN_IDLE = 2;
     private static final long DB_CONNECTION_TIMEOUT_MS = 3000L;
@@ -68,6 +68,20 @@ public class DBConnection {
                 "jdbc:mysql://%s:%s/%s?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8",
                 DB_HOST, DB_PORT, dbName
         );
+    }
+
+    private static String config(String systemProperty, String envVar, String defaultValue) {
+        String fromSystem = System.getProperty(systemProperty);
+        if (fromSystem != null) {
+            return fromSystem;
+        }
+
+        String fromEnv = System.getenv(envVar);
+        if (fromEnv != null) {
+            return fromEnv;
+        }
+
+        return defaultValue;
     }
 
     private static void closeDataSources() {
