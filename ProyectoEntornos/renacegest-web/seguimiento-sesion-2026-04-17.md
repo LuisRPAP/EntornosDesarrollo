@@ -174,3 +174,35 @@ La aplicacion mantiene el flujo funcional existente e incorpora una identidad vi
 
 ### Estado para continuar
 Se recupera una base visual estable y se deja la siguiente fase enfocada en afinar estetica por pantalla (sin perder legibilidad ni accesibilidad).
+
+---
+
+## 8) Guardado de sesion (`@#guardar#@`) - restauracion de estilo y recursos para clase
+
+### Solicitud consolidada
+1. Verificar si el diseno, fondos y estilos habian cambiado respecto a la apariencia de ayer.
+2. Conservar el estilo visual de ayer sin perder las indicaciones funcionales incorporadas despues.
+3. Dejar constancia operativa de que en el ordenador de clase se ubicara tambien la carpeta `GuardiaDeSantiago` en el mismo folder para disponer de recursos graficos.
+
+### Ajustes realizados en esta entrada
+1. Se reviso `styles.css` contra referencia de ayer para identificar diferencias visuales reales.
+2. Se restauraron elementos de estetica de ayer en `styles.css`:
+	- Paleta principal (`--accent` y `--accent-strong`) a tonos historicos.
+	- Marca de agua de fondo y sello de cabecera al emblema clasico.
+	- Marco de `brand-mark` alineado con el estilo previo.
+3. Se mantuvieron intactas las mejoras posteriores pedidas por usuario:
+	- Navegacion global y estructura de inicio.
+	- Permisos por rol/usuario y vistas nuevas.
+	- Tipografia legible y ajustes de densidad/compactacion.
+
+### Validacion tecnica
+1. Sin errores en `src/main/webapp/assets/css/styles.css` tras la actualizacion.
+2. No se han alterado rutas ni logica funcional en esta entrada; cambio acotado a capa visual.
+
+### Nota operativa para continuidad casa-clase
+1. En el ordenador de clase se espera encontrar `ProyectoEntornos/GuardiaDeSantiago` en el mismo nivel de carpetas para reutilizar fuentes, logotipos y referencias visuales sin friccion.
+2. Esta disponibilidad reduce riesgo de diferencias entre equipos al rehacer o ampliar branding.
+
+### Estado para continuar
+1. Base visual nuevamente alineada con la apariencia de ayer.
+2. El siguiente ajuste, si se solicita, debe ser micro por pantalla para igualado fino sin tocar la arquitectura funcional actual.
