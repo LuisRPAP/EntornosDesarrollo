@@ -16,10 +16,18 @@
 
                     <header class="hero hero-compact">
                         <div>
+                            <div class="brand-lockup">
+                                <img class="brand-mark"
+                                    src="${pageContext.request.contextPath}/assets/img/brand/marca-gds-centrada.png"
+                                    alt="Emblema Guardias de Santiago">
+                                <img class="brand-mark-horizontal"
+                                    src="${pageContext.request.contextPath}/assets/img/brand/logo-gds-horizontal-color.png"
+                                    alt="Logotipo Guardias de Santiago">
+                            </div>
                             <p class="eyebrow">Portal principal</p>
                             <h1>Inicio RenaceGest</h1>
-                            <p class="lead">Accede a cada seccion desde aqui. Los botones se activan segun rol y
-                                permisos.</p>
+                            <p class="lead">Gestion medieval de inventario, grupos y mensajeria con acceso por rol.
+                                Los botones se activan segun tus permisos.</p>
                         </div>
                     </header>
 

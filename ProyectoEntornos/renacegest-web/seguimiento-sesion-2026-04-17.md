@@ -206,3 +206,50 @@ Se recupera una base visual estable y se deja la siguiente fase enfocada en afin
 ### Estado para continuar
 1. Base visual nuevamente alineada con la apariencia de ayer.
 2. El siguiente ajuste, si se solicita, debe ser micro por pantalla para igualado fino sin tocar la arquitectura funcional actual.
+
+---
+
+## 9) Guardado de sesion (`@#guardar#@`) - consolidacion de cambios reales del proyecto
+
+### Contexto de esta entrada
+Se ejecuta `@#guardar#@` con una solicitud explicita de consolidar en acta todos los cambios reales pendientes en el proyecto para mantener continuidad fiable con `@#cargar#@`.
+
+### Inventario consolidado de cambios detectados en Git
+1. Archivos de codigo fuente modificados:
+	- `.gitignore`
+	- `src/main/java/com/renacegest/servlet/InicioServlet.java`
+	- `src/main/webapp/WEB-INF/jsp/inicio.jsp`
+	- `src/main/webapp/assets/css/styles.css`
+2. Recursos graficos nuevos detectados en el proyecto:
+	- `src/main/webapp/assets/img/backgrounds/cartel-ambientacion.jpg`
+	- `src/main/webapp/assets/img/backgrounds/cartel-pergamino.jpg`
+	- `src/main/webapp/assets/img/backgrounds/medieval-plaza.jpg`
+3. Artefactos de compilacion/despliegue modificados (derivados del build):
+	- Multiples `.class` en `target/classes/...`
+	- Multiples `.class` en `target/renacegest-web/WEB-INF/classes/...`
+	- `target/renacegest-web.war`
+	- `target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst`
+
+### Cambios funcionales y visuales consolidados
+1. Ajuste de enrutado en servlet de inicio:
+	- `InicioServlet` deja de mapear `/` y queda en `"/inicio"`.
+2. Refuerzo de identidad visual en la pantalla de inicio:
+	- Se incorpora lockup de marca (emblema + logotipo horizontal) en `inicio.jsp`.
+	- Se actualiza el texto de portada para describir la gestion por rol.
+3. Evolucion de tema visual global en `styles.css`:
+	- Nueva paleta base y variantes de paneles/botones.
+	- Fondo principal con imagen medieval y overlays.
+	- Hero con carteles de ambientacion y ajustes especificos para `inicio-shell`.
+	- Ajustes de estilo en botoneria (forma, mayusculas, sombras, contraste).
+4. Ajuste de versionado para recursos de fondo:
+	- `.gitignore` permite versionar imagenes de `assets/img/backgrounds` con extensiones `jpg`, `jpeg` y `png`.
+
+### Estadistica tecnica del estado actual
+1. Resumen de diff reportado: `48 files changed, 194 insertions(+), 106 deletions(-)`.
+2. Se detecta variacion de tamano del WAR (`target/renacegest-web.war`) por inclusion de recursos/artefactos actualizados.
+3. Aparecen avisos de fin de linea (LF/CRLF) en ficheros de `target/maven-status` sin bloqueo funcional.
+
+### Estado de guardado
+1. Esta entrada deja consolidado el estado real del proyecto a fecha 2026-04-17.
+2. No se ha ejecutado commit en esta accion de guardado; la consolidacion es documental en acta de sesion.
+3. En la proxima ejecucion de `@#cargar#@`, continuar desde esta seccion como ultimo estado cronologico.

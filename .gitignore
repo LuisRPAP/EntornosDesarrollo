@@ -14,6 +14,9 @@
 !ProyectoEntornos/renacegest-web/src/main/webapp/assets/fonts/*.otf
 !ProyectoEntornos/renacegest-web/src/main/webapp/assets/fonts/*.ttf
 !ProyectoEntornos/renacegest-web/src/main/webapp/assets/img/brand/*.png
+!ProyectoEntornos/renacegest-web/src/main/webapp/assets/img/backgrounds/*.jpg
+!ProyectoEntornos/renacegest-web/src/main/webapp/assets/img/backgrounds/*.jpeg
+!ProyectoEntornos/renacegest-web/src/main/webapp/assets/img/backgrounds/*.png
 Diagramas/
 Git/
 JUnit/
