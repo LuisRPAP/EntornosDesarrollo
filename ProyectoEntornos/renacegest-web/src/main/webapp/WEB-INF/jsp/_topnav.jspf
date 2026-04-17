@@ -1,0 +1,37 @@
+<%@ page import="com.renacegest.servlet.PermissionService" %>
+<%@ page import="com.renacegest.servlet.AuthUtil" %>
+<%
+    String currentRoleNav = AuthUtil.getCurrentRole(request);
+    Long currentUserIdNav = AuthUtil.getCurrentUserId(request);
+    boolean loggedNav = currentRoleNav != null;
+    String ctx = request.getContextPath();
+
+    boolean canHomeNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_HOME);
+    boolean canInvNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_INVENTARIO);
+    boolean canGruNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_GRUPOS);
+    boolean canGruResNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_GRUPOS_RESUMEN);
+    boolean canMenNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_MENSAJES);
+    boolean canLisNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_LISTADOS);
+    boolean canImpNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_IMPORTACION);
+    boolean canGuaNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_GUARDIAS);
+    boolean canPerNav = PermissionService.canAccess(application, currentRoleNav, currentUserIdNav, PermissionService.SECTION_PERMISOS);
+%>
+<div class="global-nav">
+    <a class="button button-secondary button-nav" href="<%= ctx %>/inicio">Inicio</a>
+    <% if (loggedNav && canHomeNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/home">Panel</a><% } %>
+    <% if (loggedNav && canInvNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/inventario">Inventario</a><% } %>
+    <% if (loggedNav && canGruNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/grupos">Grupos</a><% } %>
+    <% if (loggedNav && canGruResNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/grupos-resumen">Resumen grupos</a><% } %>
+    <% if (loggedNav && canMenNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/mensajes">Mensajes</a><% } %>
+    <% if (loggedNav && canLisNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/listados">Listados</a><% } %>
+    <% if (loggedNav && canImpNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/importacion">Importacion</a><% } %>
+    <% if (loggedNav && canGuaNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/guardias">Guardias</a><% } %>
+    <% if (loggedNav && canPerNav) { %><a class="button button-secondary button-nav" href="<%= ctx %>/permisos">Permisos</a><% } %>
+
+    <% if (!loggedNav) { %>
+        <a class="button button-primary button-nav" href="<%= ctx %>/login">Entrar</a>
+    <% } else { %>
+        <a class="button button-primary button-nav" href="<%= ctx %>/login">Cambiar usuario</a>
+        <a class="button button-secondary button-nav" href="<%= ctx %>/logout">Salir</a>
+    <% } %>
+</div>

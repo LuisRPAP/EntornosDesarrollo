@@ -1,6 +1,7 @@
 package com.renacegest.servlet;
 
 import com.renacegest.dao.RenaceGestRepository;
+import com.renacegest.model.Pertrecho;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -11,12 +12,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet(urlPatterns = {"/inventario"})
 public class InventarioServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_INVENTARIO, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 
@@ -25,7 +27,7 @@ public class InventarioServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_INVENTARIO, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 
@@ -66,6 +68,7 @@ public class InventarioServlet extends HttpServlet {
                         Integer.parseInt(request.getParameter("integridadManual")),
                         request.getParameter("estadoIaManual"),
                         Boolean.parseBoolean(request.getParameter("disponibleManual")),
+                    parseDouble(request.getParameter("valorEconomicoManual")),
                         currentUserId
                 );
                 estado = "Pertrecho creado correctamente.";
@@ -77,6 +80,7 @@ public class InventarioServlet extends HttpServlet {
                         Integer.parseInt(request.getParameter("integridadEditar")),
                         request.getParameter("estadoIaEditar"),
                         Boolean.parseBoolean(request.getParameter("disponibleEditar")),
+                        parseDouble(request.getParameter("valorEconomicoEditar")),
                         currentUserId
                 );
                 estado = "Pertrecho actualizado correctamente.";
@@ -110,14 +114,14 @@ public class InventarioServlet extends HttpServlet {
                     currentUserId,
                         request.getParameter("observacionesSalida")
                 );
-                estado = "Alarde registrado: salida de pertrecho confirmada.";
+                estado = "Prestamo registrado: salida de pertrecho confirmada.";
             } else if ("devolver".equalsIgnoreCase(accion)) {
                 repository.registrarDevolucion(
                         Long.valueOf(request.getParameter("alardeId")),
                         Integer.parseInt(request.getParameter("integridadEntrada")),
                         request.getParameter("observacionesEntrada")
                 );
-                estado = "Devolucion registrada y puntos de honor recalculados.";
+                    estado = "Devolucion de prestamo registrada y puntos de honor recalculados.";
             } else {
                 estado = "Accion no reconocida.";
             }
@@ -137,7 +141,10 @@ public class InventarioServlet extends HttpServlet {
         request.setAttribute("estado", estado);
         request.setAttribute("guardias", repository.findAllGuardias());
         request.setAttribute("secciones", repository.findAllSecciones());
-        request.setAttribute("pertrechos", repository.findAllPertrechos());
+        List<Pertrecho> pertrechos = repository.findAllPertrechos();
+        request.setAttribute("pertrechos", pertrechos);
+        request.setAttribute("pertrechosActivos", pertrechos.stream().filter(Pertrecho::isActivo).collect(Collectors.toList()));
+        request.setAttribute("pertrechosArchivados", pertrechos.stream().filter(pertrecho -> !pertrecho.isActivo()).collect(Collectors.toList()));
         request.setAttribute("alardes", repository.findAllAlardes());
         request.setAttribute("ticketsMaestranza", repository.getTotalTicketsMaestranza());
         request.setAttribute("currentRole", role);
@@ -152,5 +159,17 @@ public class InventarioServlet extends HttpServlet {
 
     private RenaceGestRepository repository(HttpServletRequest request) {
         return SessionRepositoryResolver.resolve(request);
+    }
+
+    private double parseDouble(String value) {
+        if (value == null || value.isBlank()) {
+            return 0.0;
+        }
+
+        try {
+            return Math.max(0.0, Double.parseDouble(value.replace(',', '.')));
+        } catch (NumberFormatException ex) {
+            return 0.0;
+        }
     }
 }

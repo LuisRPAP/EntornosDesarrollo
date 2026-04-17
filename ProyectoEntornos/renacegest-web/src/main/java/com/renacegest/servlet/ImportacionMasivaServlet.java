@@ -34,7 +34,7 @@ public class ImportacionMasivaServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_IMPORTACION, "Maestre", "Sargento")) {
             return;
         }
         applyResetMessageIfPresent(request);
@@ -45,7 +45,7 @@ public class ImportacionMasivaServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_IMPORTACION, "Maestre", "Sargento")) {
             return;
         }
 
@@ -160,13 +160,14 @@ public class ImportacionMasivaServlet extends HttpServlet {
         int integridad = parseInt(value(row, 2, "100"), "integridad");
         String estadoIa = value(row, 3, "Pendiente");
         boolean disponible = parseBoolean(value(row, 4, "true"));
+        double valorEconomico = parseDouble(value(row, 5, "0"));
 
         Long seccionId = findSeccionIdByNombre(repository.findAllSecciones(), seccionNombre);
         if (seccionId == null) {
             throw new IllegalArgumentException("No existe seccion con nombre '" + seccionNombre + "'.");
         }
 
-        repository.crearPertrechoManual(seccionId, descripcion, integridad, estadoIa, disponible, currentUserId);
+        repository.crearPertrechoManual(seccionId, descripcion, integridad, estadoIa, disponible, valorEconomico, currentUserId);
     }
 
     private void importGrupoRow(RenaceGestRepository repository, List<String> row, Long currentUserId) {
@@ -438,6 +439,18 @@ public class ImportacionMasivaServlet extends HttpServlet {
                 || "si".equals(value)
                 || "yes".equals(value)
                 || "y".equals(value);
+    }
+
+    private double parseDouble(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return 0.0;
+        }
+
+        try {
+            return Math.max(0.0, Double.parseDouble(raw.trim().replace(',', '.')));
+        } catch (NumberFormatException ex) {
+            throw new IllegalArgumentException("Valor economico invalido: " + raw);
+        }
     }
 
     private boolean isRowEmpty(List<String> row) {

@@ -14,7 +14,7 @@ import java.io.IOException;
 public class MensajeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_MENSAJES, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 
@@ -23,7 +23,7 @@ public class MensajeServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_MENSAJES, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 

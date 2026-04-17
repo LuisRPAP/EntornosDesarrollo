@@ -34,7 +34,7 @@ public class ListadosServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_LISTADOS, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 

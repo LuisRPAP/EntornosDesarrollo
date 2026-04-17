@@ -78,10 +78,10 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
         SeccionMaestranza sastreria = crearSeccion("Sastreria", 2L, 1L);
         SeccionMaestranza ornamentos = crearSeccion("Ornamentos", 3L, 1L);
 
-        crearPertrechoManual(armeria.getId(), "Morrion de desfile de acero pavonado", 95, "Validado", true);
-        crearPertrechoManual(armeria.getId(), "Arcabuz de instruccion", 88, "Validado", true);
-        crearPertrechoManual(sastreria.getId(), "Jubon de terciopelo rojo", 92, "Pendiente", true);
-        crearPertrechoManual(ornamentos.getId(), "Estandarte bordado de Santiago", 97, "Validado", true);
+        crearPertrechoManual(armeria.getId(), "Morrion de desfile de acero pavonado", 95, "Validado", true, 240.0);
+        crearPertrechoManual(armeria.getId(), "Arcabuz de instruccion", 88, "Validado", true, 420.0);
+        crearPertrechoManual(sastreria.getId(), "Jubon de terciopelo rojo", 92, "Pendiente", true, 180.0);
+        crearPertrechoManual(ornamentos.getId(), "Estandarte bordado de Santiago", 97, "Validado", true, 310.0);
 
         cargarGaleriaPublicaInicial();
     }
@@ -447,7 +447,7 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public synchronized Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
+    public synchronized Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden crear pertrechos.");
         }
@@ -457,12 +457,13 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
                 descripcion == null ? "" : descripcion.trim(),
                 acotar(integridad, 0, 100),
                 estadoIa == null || estadoIa.isBlank() ? "Pendiente" : estadoIa,
-                disponible
+                disponible,
+                Math.max(0.0, valorEconomico)
         );
     }
 
     @Override
-    public synchronized Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
+    public synchronized Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden editar pertrechos.");
         }
@@ -483,6 +484,7 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
         pertrecho.setIntegridad(acotar(integridad, 0, 100));
         pertrecho.setEstadoIa(estadoIa == null || estadoIa.isBlank() ? pertrecho.getEstadoIa() : estadoIa);
         pertrecho.setDisponible(disponible);
+        pertrecho.setValorEconomico(Math.max(0.0, valorEconomico));
         return pertrecho;
     }
 
@@ -502,7 +504,10 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
             throw new IllegalArgumentException("No se puede eliminar un pertrecho con alarde abierto.");
         }
 
-        pertrechos.remove(pertrechoId);
+        pertrecho.setActivo(false);
+        pertrecho.setDisponible(false);
+        pertrecho.setFechaBaja(timestampNow());
+        pertrecho.setMotivoBaja("Baja manual");
         return true;
     }
 
@@ -524,7 +529,8 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
 
         boolean autoValidado = sugerencia.getConfianza() > 80;
         String estadoIa = autoValidado ? "Validado" : "Pendiente";
-        Pertrecho pertrecho = crearPertrechoManual(seccion.getId(), descripcion.trim(), 100, estadoIa, true);
+        double valorEconomicoEstimado = Math.max(0.0, sugerencia.getConfianza() * 1.5);
+        Pertrecho pertrecho = crearPertrechoManual(seccion.getId(), descripcion.trim(), 100, estadoIa, true, valorEconomicoEstimado);
         return new ResultadoClasificacionIa(pertrecho, sugerencia.getNombreSeccion(), sugerencia.getConfianza(), autoValidado);
     }
 
@@ -783,7 +789,7 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
         return new IaSugerencia("Aposentos", 64);
     }
 
-    private Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible) {
+    private Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico) {
         SeccionMaestranza seccion = secciones.get(seccionId);
         if (seccion == null) {
             throw new IllegalArgumentException("Seccion no encontrada.");
@@ -797,7 +803,12 @@ public class InMemoryRenaceGestRepository implements RenaceGestRepository {
                 integridad,
                 estadoIa,
                 generarTokenQr(),
-                disponible
+                disponible,
+                true,
+                Math.max(0.0, valorEconomico),
+                timestampNow(),
+                null,
+                null
         );
         pertrechos.put(pertrecho.getId(), pertrecho);
         return pertrecho;

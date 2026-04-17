@@ -1,6 +1,7 @@
 com\renacegest\db\DBConnection.class
 com\renacegest\model\SeccionMaestranza.class
 com\renacegest\dao\InMemoryRenaceGestRepository$RecoveryData.class
+com\renacegest\servlet\GrupoResumenServlet.class
 com\renacegest\dao\MySQLRenaceGestRepository$IaSugerencia.class
 com\renacegest\servlet\QrPublicoServlet.class
 com\renacegest\model\MensajeComunicacion.class
@@ -13,11 +14,14 @@ com\renacegest\servlet\AmigosServlet.class
 com\renacegest\dao\MySQLRenaceGestRepository.class
 com\renacegest\servlet\ResetPruebaDatabaseServlet.class
 com\renacegest\servlet\ImportacionMasivaServlet.class
+com\renacegest\servlet\InicioServlet.class
 com\renacegest\servlet\LoginServlet.class
 com\renacegest\model\ValoracionFotoPublica.class
 com\renacegest\servlet\GrupoServlet.class
 com\renacegest\model\EtiquetaPersonaPublica.class
+com\renacegest\servlet\PermissionService.class
 com\renacegest\dao\RenaceGestRepository.class
+com\renacegest\servlet\PermisosServlet.class
 com\renacegest\model\ResultadoClasificacionIa.class
 com\renacegest\servlet\LogoutServlet.class
 com\renacegest\model\GrupoMision.class

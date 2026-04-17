@@ -18,7 +18,7 @@ import java.util.Map;
 public class GrupoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_GRUPOS, "Maestre", "Sargento", "Guardia")) {
             return;
         }
         cargarVista(request, response, null);
@@ -26,7 +26,7 @@ public class GrupoServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_GRUPOS, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 

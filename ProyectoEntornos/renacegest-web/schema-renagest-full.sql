@@ -93,6 +93,10 @@ CREATE TABLE IF NOT EXISTS pertrechos (
     estado_ia VARCHAR(50) DEFAULT 'Pendiente',
     token_qr VARCHAR(50) UNIQUE,
     disponible BOOLEAN DEFAULT TRUE,
+    valor_economico DECIMAL(12,2) DEFAULT 0,
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_baja TIMESTAMP NULL,
+    motivo_baja VARCHAR(255),
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seccion_id) REFERENCES secciones_maestranza(id) ON DELETE RESTRICT,
     INDEX idx_token_qr (token_qr)

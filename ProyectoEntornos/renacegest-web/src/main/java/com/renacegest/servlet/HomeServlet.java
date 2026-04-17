@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre", "Sargento", "Guardia")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_HOME, "Maestre", "Sargento", "Guardia")) {
             return;
         }
 

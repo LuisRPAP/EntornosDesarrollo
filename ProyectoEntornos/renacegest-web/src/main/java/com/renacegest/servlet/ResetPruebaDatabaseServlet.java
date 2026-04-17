@@ -13,7 +13,7 @@ import java.io.IOException;
 public class ResetPruebaDatabaseServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (!AuthUtil.requireAnyRole(request, response, "Maestre")) {
+        if (!PermissionService.requireSectionAccess(request, response, PermissionService.SECTION_IMPORTACION, "Maestre")) {
             return;
         }
 

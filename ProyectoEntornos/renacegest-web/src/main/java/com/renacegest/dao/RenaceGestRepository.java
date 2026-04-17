@@ -51,9 +51,9 @@ public interface RenaceGestRepository {
 
     Pertrecho findPertrechoById(Long pertrechoId);
 
-    Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId);
+    Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico, Long solicitanteId);
 
-    Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId);
+    Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico, Long solicitanteId);
 
     boolean eliminarPertrecho(Long pertrechoId, Long solicitanteId);
 

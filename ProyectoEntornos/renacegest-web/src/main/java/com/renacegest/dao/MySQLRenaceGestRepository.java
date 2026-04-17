@@ -673,7 +673,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
 
     @Override
     public List<Pertrecho> findAllPertrechos() {
-        String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible FROM pertrechos ORDER BY id";
+        String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible, activo, valor_economico, DATE_FORMAT(fecha_creacion, '%d/%m/%Y %H:%i') AS fecha_creacion, DATE_FORMAT(fecha_baja, '%d/%m/%Y %H:%i') AS fecha_baja, motivo_baja FROM pertrechos ORDER BY activo DESC, id DESC";
         List<Pertrecho> pertrechos = new ArrayList<>();
 
         try (Connection conn = DBConnection.getConnection();
@@ -689,7 +689,12 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
                         rs.getInt("integridad"),
                         rs.getString("estado_ia"),
                         rs.getString("token_qr"),
-                        rs.getBoolean("disponible")
+                    rs.getBoolean("disponible"),
+                    rs.getBoolean("activo"),
+                    rs.getDouble("valor_economico"),
+                    rs.getString("fecha_creacion"),
+                    rs.getString("fecha_baja"),
+                    rs.getString("motivo_baja")
                 );
                 pertrechos.add(p);
             }
@@ -702,7 +707,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
 
     @Override
     public Pertrecho findPertrechoById(Long pertrechoId) {
-        String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible FROM pertrechos WHERE id = ?";
+        String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible, activo, valor_economico, DATE_FORMAT(fecha_creacion, '%d/%m/%Y %H:%i') AS fecha_creacion, DATE_FORMAT(fecha_baja, '%d/%m/%Y %H:%i') AS fecha_baja, motivo_baja FROM pertrechos WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -718,7 +723,12 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
                             rs.getInt("integridad"),
                             rs.getString("estado_ia"),
                             rs.getString("token_qr"),
-                            rs.getBoolean("disponible")
+                            rs.getBoolean("disponible"),
+                            rs.getBoolean("activo"),
+                            rs.getDouble("valor_economico"),
+                            rs.getString("fecha_creacion"),
+                            rs.getString("fecha_baja"),
+                            rs.getString("motivo_baja")
                     );
                 }
             }
@@ -735,7 +745,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             return null;
         }
 
-        String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible FROM pertrechos WHERE token_qr = ?";
+        String sql = "SELECT id, seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible, activo, valor_economico, DATE_FORMAT(fecha_creacion, '%d/%m/%Y %H:%i') AS fecha_creacion, DATE_FORMAT(fecha_baja, '%d/%m/%Y %H:%i') AS fecha_baja, motivo_baja FROM pertrechos WHERE token_qr = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -751,7 +761,12 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
                             rs.getInt("integridad"),
                             rs.getString("estado_ia"),
                             rs.getString("token_qr"),
-                            rs.getBoolean("disponible")
+                            rs.getBoolean("disponible"),
+                            rs.getBoolean("activo"),
+                            rs.getDouble("valor_economico"),
+                            rs.getString("fecha_creacion"),
+                            rs.getString("fecha_baja"),
+                            rs.getString("motivo_baja")
                     );
                 }
             }
@@ -763,7 +778,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
+    public Pertrecho crearPertrechoManual(Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden crear pertrechos.");
         }
@@ -773,7 +788,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             throw new IllegalArgumentException("Sección no encontrada.");
         }
 
-        String sql = "INSERT INTO pertrechos (seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pertrechos (seccion_id, seccion_nombre, descripcion, integridad, estado_ia, token_qr, disponible, valor_economico, activo, fecha_baja, motivo_baja) VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, NULL, NULL)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -787,6 +802,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             pstmt.setString(5, estadoIa == null || estadoIa.isBlank() ? "Pendiente" : estadoIa);
             pstmt.setString(6, tokenQr);
             pstmt.setBoolean(7, disponible);
+            pstmt.setDouble(8, Math.max(0.0, valorEconomico));
 
             pstmt.executeUpdate();
 
@@ -804,7 +820,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
     }
 
     @Override
-    public Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, Long solicitanteId) {
+    public Pertrecho actualizarPertrecho(Long pertrechoId, Long seccionId, String descripcion, int integridad, String estadoIa, boolean disponible, double valorEconomico, Long solicitanteId) {
         if (!puedeGestionarInventario(solicitanteId)) {
             throw new IllegalArgumentException("Solo Maestre o Sargento pueden editar pertrechos.");
         }
@@ -819,7 +835,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             throw new IllegalArgumentException("Seccion no encontrada.");
         }
 
-        String sql = "UPDATE pertrechos SET seccion_id = ?, seccion_nombre = ?, descripcion = ?, integridad = ?, estado_ia = ?, disponible = ? WHERE id = ?";
+        String sql = "UPDATE pertrechos SET seccion_id = ?, seccion_nombre = ?, descripcion = ?, integridad = ?, estado_ia = ?, disponible = ?, valor_economico = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -830,7 +846,8 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             pstmt.setInt(4, acotar(integridad, 0, 100));
             pstmt.setString(5, estadoIa == null || estadoIa.isBlank() ? pertrecho.getEstadoIa() : estadoIa);
             pstmt.setBoolean(6, disponible);
-            pstmt.setLong(7, pertrechoId);
+            pstmt.setDouble(7, Math.max(0.0, valorEconomico));
+            pstmt.setLong(8, pertrechoId);
 
             pstmt.executeUpdate();
             return findPertrechoById(pertrechoId);
@@ -865,7 +882,7 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
             throw new RuntimeException("Error al verificar alardes: " + e.getMessage(), e);
         }
 
-        String sql = "DELETE FROM pertrechos WHERE id = ?";
+        String sql = "UPDATE pertrechos SET disponible = FALSE, activo = FALSE, fecha_baja = NOW(), motivo_baja = 'Baja manual' WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -894,7 +911,8 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
 
         boolean autoValidado = sugerencia.getConfianza() > 80;
         String estadoIa = autoValidado ? "Validado" : "Pendiente";
-        Pertrecho pertrecho = crearPertrechoManual(seccion.getId(), descripcion.trim(), 100, estadoIa, true, solicitanteId);
+        double valorEconomicoEstimado = Math.max(0.0, sugerencia.getConfianza() * 1.5);
+        Pertrecho pertrecho = crearPertrechoManual(seccion.getId(), descripcion.trim(), 100, estadoIa, true, valorEconomicoEstimado, solicitanteId);
 
         return new ResultadoClasificacionIa(pertrecho, sugerencia.getNombreSeccion(), sugerencia.getConfianza(), autoValidado);
     }
@@ -929,7 +947,13 @@ public class MySQLRenaceGestRepository implements RenaceGestRepository {
 
     @Override
     public List<Pertrecho> findPertrechosPublicos() {
-        return findAllPertrechos();
+        List<Pertrecho> visibles = new ArrayList<>();
+        for (Pertrecho pertrecho : findAllPertrechos()) {
+            if (pertrecho.isActivo()) {
+                visibles.add(pertrecho);
+            }
+        }
+        return visibles;
     }
 
     // ==================== ALARDES ====================
