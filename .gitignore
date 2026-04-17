@@ -11,6 +11,9 @@
 *.zip
 *.ppsx
 *.ttf
+!ProyectoEntornos/renacegest-web/src/main/webapp/assets/fonts/*.otf
+!ProyectoEntornos/renacegest-web/src/main/webapp/assets/fonts/*.ttf
+!ProyectoEntornos/renacegest-web/src/main/webapp/assets/img/brand/*.png
 Diagramas/
 Git/
 JUnit/
